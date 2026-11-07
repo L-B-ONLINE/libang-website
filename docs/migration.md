@@ -27,3 +27,14 @@
 - Cloudflare GitHub 앱에서 조직 `L-B-ONLINE`의 `libang-website` 접근을 다시 연결해야 Workers 자동 빌드 진행 가능.
 - Worker 배포와 운영 도메인 전환은 아직 하지 않음. 기존 `web.libang.online`은 Sites에서 계속 운영 중.
 - 이전 완료 전 필요한 비밀키: `MICROSOFT_CLIENT_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`. 값은 채팅이나 GitHub 대신 Cloudflare 보안 입력란에서 설정.
+
+## 2026-11-07 03:10 UTC 배포 완료
+
+- 조직 Git 연결 복구 확인. Workers `libang-website` 생성 및 main 자동 배포 연결 완료.
+- 최초 Workers Builds 성공: `131d23b3-89a0-4032-92eb-a79f2898032c`.
+- 배포 소스: `4591bd964a5364c6ba3cc69d22be4ce8450cd788`.
+- 주소: https://libang-website.geunyanggecko.workers.dev
+- Node.js 24 / pnpm 11.25.0, 빌드 `pnpm build`, 배포 `pnpm run deploy`.
+- 공개 변수 4개와 운영 D1 바인딩 적용. 향후 배포 시 dashboard 변수는 `keep_vars`로 보존.
+- 문서만 바뀐 경우에는 불필요한 재배포를 하지 않도록 `**/*.md` 빌드 제외.
+- 비밀키 2개 입력, 로그인 및 Microsoft 연결 검증, 운영 도메인 전환은 남아 있음.
