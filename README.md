@@ -1,5 +1,7 @@
 # L.B ONLINE
 
+운영 사이트: https://web.libang.online
+
 리뱅 온라인의 Next.js / React 웹사이트입니다. vinext와 Cloudflare Workers에서 실행하고, 게시글과 가이드는 D1, 로그인은 Supabase Auth를 사용합니다.
 
 ## 개발 및 검증

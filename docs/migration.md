@@ -76,3 +76,15 @@
 - 라이트 기본값(운영체제 다크), 저장된 다크 선택, 서버 안내, 구 링크 리디렉션, Bose 가이드도 브라우저 검증.
 
 - Cloudflare 자동 배포 `0b3bb3a4-dae8-4a16-a26b-7eca77b3e980` 성공. 실제 Workers URL에서도 동일 Chromium 시나리오 통과, 페이지 오류 없음.
+
+## 운영 도메인 전환 및 기존 GPT 사이트 공개 종료
+
+- 운영 주소: https://web.libang.online
+- Cloudflare Worker `libang-website`의 Custom Domain으로 연결. DNS와 TLS 인증서는 Cloudflare가 관리하며, `vite.config.ts`에도 운영 도메인을 선언해 이후 배포에 유지.
+- Worker 도메인 ID: `b5d2c5d881ca0b7ea904c52067d8ce411c90a5fa`.
+- 기존 Sites의 web.libang.online 연결 해제, 소유자만 접근하는 비공개 보관으로 전환. 기존 ChatGPT Sites 주소는 무인증 요청에 HTTP 401 반환.
+- 옛 ChatGPT CNAME과 전용 TXT 검증 레코드 2개 정리. 다른 메일·Minecraft·Pages 서비스의 DNS는 보존.
+- 전환 전 게시글·가이드·관리자 설정의 원본 일치를 확인. 새 사이트에서 변경된 계정 연결 상태는 유지하고 옛 프로필로 덮어쓰지 않음.
+- 운영 도메인에서 메인·포럼·가이드·서버·로그인·프로필·공개 설정 API·로고 HTTP 200 확인. 인증 없이 관리자 계정 API 접근은 예상대로 HTTP 401.
+- 도메인 선언 커밋 `aca5e3f8a9ce5245246a651289c8bd4ee9d678f9`의 자동 빌드 `fa17f728-e4dc-40ca-8493-24348b89fe3b` 성공.
+- 운영 도메인에서도 Chromium 모바일 브라우저 검증 통과: 4회 페이지 이동 중 문서/auth/profile 요청 각각 1회, 얼굴 유지, 테마·서버 안내·구 링크 리디렉션 확인. 페이지 오류 없음.
