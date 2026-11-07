@@ -38,3 +38,13 @@
 - 공개 변수 4개와 운영 D1 바인딩 적용. 향후 배포 시 dashboard 변수는 `keep_vars`로 보존.
 - 문서만 바뀐 경우에는 불필요한 재배포를 하지 않도록 `**/*.md` 빌드 제외.
 - 비밀키 2개 입력, 로그인 및 Microsoft 연결 검증, 운영 도메인 전환은 남아 있음.
+
+## 비밀키 설정 및 후속 키 전환
+
+- Cloudflare에 `MICROSOFT_CLIENT_SECRET`, `SUPABASE_SERVICE_ROLE_KEY`를 Secret으로 설정 완료. 키 값은 저장소에 기록하지 않음.
+- Supabase의 기존 `anon` / `service_role` 방식은 우선 유지하고, 사용자 요청에 따라 새 키 전환은 후속 작업으로 분리.
+- 공식 API Keys 문서는 2026년 말까지 legacy 키 deprecation을 안내하지만, 2027-01-01에 자동으로 모든 키가 정지된다고 명시하지 않음. 연말 전에 전환 검토.
+- 후속 작업: 브라우저에는 `sb_publishable_…`, 서버에는 `sb_secret_…` 적용. Supabase SDK 초기화, Cloudflare 변수, Minecraft relay 호출 헤더 및 Edge Function의 인증 처리를 함께 변경하고 검증.
+- 새 키는 JWT가 아니므로 기존 Bearer 전달 방식에 단순히 값만 교체하지 않음. Edge Function의 `apikey` 헤더와 자체 인증을 공식 문서에 맞춰 검증.
+- 새 키 전환과 로그인·관리자·Minecraft 연결 확인을 마친 후에만 구형 키 비활성화. JWT signing secret의 무계획한 회전은 기존 세션에 영향을 줄 수 있으므로 별도 검토.
+- 참고: https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys
