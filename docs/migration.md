@@ -55,3 +55,13 @@
 - 기존 배포된 `minecraft-auth` 함수의 health 호출은 HTTP 401 / `unauthorized`. 플랫폼 관리자 API 키의 유효성과 중계 함수의 고정 키 비교 결과가 다르므로 인증 설정 불일치를 추가 점검해야 함.
 - Edge Function v2 소스를 읽어, 런타임 `SUPABASE_SERVICE_ROLE_KEY` 및 `SUPABASE_SECRET_KEYS` 값과 요청 토큰을 정확 비교하는 기존 구현임을 확인. 인증을 우회하거나 기존 키를 폐기하는 변경은 하지 않음.
 - 전체 이전 완료 전 Microsoft 연결 및 Minecraft 중계의 실제 성공 검증이 필요.
+
+## Minecraft 중계 인증 수정 완료
+
+- 문제: 관리자 API에서 유효한 legacy service_role JWT도 Edge Function 런타임 키와 문자열이 다르면 정확 비교에서 거절됨.
+- 수정: 기존 키의 정확 비교를 유지하고, 일치하지 않는 legacy JWT는 프로젝트·role·만료를 먼저 확인한 뒤 같은 Supabase 프로젝트의 관리자 API로 서명과 관리자 권한을 검증. 검증 실패나 장애 시 중계 요청을 허용하지 않음.
+- Edge Function `minecraft-auth` v3 배포, `verify_jwt=true` 유지. 새 API 키 방식으로의 전환은 하지 않음.
+- 회귀 테스트 20개 및 TypeScript 검사 통과. 다른 프로젝트·일반 사용자·만료/위조 JWT·검증 서버 장애 차단 포함.
+- 실제 service_role 키 health 호출: HTTP 200, `reachable=true`, Minecraft upstream HTTP 401 (의도적으로 잘못된 진단 토큰에 대한 정상 거절).
+- 실제 무인증 및 잘못된 키 요청: HTTP 401. 키 값과 관리자 API 응답의 사용자 정보는 로그/저장소에 기록하지 않음.
+- 실제 사용자 Microsoft 로그인 및 OAuth 콜백은 별도 사용자 확인 필요. 운영 도메인은 아직 기존 Sites에 연결되어 있음.
