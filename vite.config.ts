@@ -16,6 +16,11 @@ const localBindingConfig = {
   compatibility_flags: ["nodejs_compat"],
   workers_dev: true,
   keep_vars: true,
+  routes: preview ? [] : [{
+    pattern: "web.libang.online",
+    custom_domain: true,
+    zone_id: "709c76eba2ebdc99b7194f9bb32857db",
+  }],
   observability: { enabled: true, traces: { enabled: true, head_sampling_rate: 0.1 } },
   d1_databases: [{
     binding: "DB",
