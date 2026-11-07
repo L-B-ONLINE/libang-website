@@ -1,110 +1,46 @@
-# L.B ONLINE Website
+# L.B ONLINE
 
-리뱅 온라인 네트워크의 공식 웹사이트입니다.
+리뱅 온라인의 Next.js / React 웹사이트입니다. vinext와 Cloudflare Workers에서 실행하고, 게시글과 가이드는 D1, 로그인은 Supabase Auth를 사용합니다.
 
-Cloudflare Pages + Functions + KV + D1 기반으로 운영되며, 서버 목록/패치 노트/운영진/사이트 문구를 관리자 계정으로 편집할 수 있습니다. 결제 위젯은 제거했고, 후원 및 구매 상담은 공식 문의 채널로 연결합니다.
+## 개발 및 검증
 
-## 주요 기능
+Node.js 24 LTS와 pnpm 11.25.0을 사용합니다.
 
-- Liquid glass 스타일의 밝은 반응형 UI
-- Home, Servers, Support, Patches, Team 분리 페이지
-- 로그인 계정 기반 관리자 편집 모드
-- 서버 목록, 패치 노트, 운영진 순서 변경/추가/삭제/저장
-- KV 콘텐츠 저장과 D1 계정/세션 관리
-
-## 프로젝트 구조
-
-```text
-public/
-  index.html
-  auth/index.html
-  servers/index.html
-  support/index.html
-  patch/index.html
-  team/index.html
-  assets/
-    libang-icon.png
-    site.css
-    site.js
-functions/
-  _lib/
-    auth.js
-    password.js
-  api/
-    auth/
-    servers.js
-    patch.js
-    team.js
-    site.js
-schema.sql
+```sh
+pnpm install --frozen-lockfile
+cp .dev.vars.example .dev.vars
+pnpm dev
+pnpm typecheck
+pnpm test
+pnpm build
 ```
 
-## 로컬 실행
+실제 키, `.env`, `.dev.vars`, 데이터 덤프는 커밋하지 않습니다. Supabase 서버 키와 Microsoft 비밀키는 브라우저에 전달하면 안 됩니다.
 
-Cloudflare Pages 프로젝트 이름이 `libang-website`이고 대시보드에서 기존 바인딩을 관리 중이라면, 먼저 현재 설정을 내려받아 로컬 Wrangler 설정으로 사용합니다.
+## Cloudflare 배포
 
-```bash
-npx wrangler pages download config libang-website
+`vite.config.ts`가 Worker 이름, D1 바인딩, 호환 날짜, 로그·트레이스 설정을 관리합니다. 빌드가 `dist/server/wrangler.json`과 정적 파일을 생성합니다.
+
+```sh
+pnpm build
+pnpm deploy
 ```
 
-D1에 계정/세션 스키마를 적용합니다. `<D1_DATABASE_NAME>`은 실제 D1 데이터베이스 이름으로 바꿉니다.
+기본 대상은 `libang-website` / `libang-production`입니다. 별도 시험 환경은 `CLOUDFLARE_ENV=preview pnpm build`로 빌드하며 `libang-website-preview` / `libang-preview`를 사용합니다. 시험 환경에는 운영 개인정보를 복제하지 않습니다.
 
-```bash
-npx wrangler d1 execute <D1_DATABASE_NAME> --local --file=./schema.sql
-```
+Worker의 Settings → Variables and Secrets에서 다음 항목을 설정합니다.
 
-로컬 Pages와 Functions를 실행합니다.
+| 변수 | 유형 | 용도 |
+| --- | --- | --- |
+| SUPABASE_URL | Text | 기존 Supabase 프로젝트 URL |
+| SUPABASE_ANON_KEY | Text | 브라우저 로그인용 공개 키 |
+| MICROSOFT_CLIENT_ID | Text | 기존 Microsoft 애플리케이션 ID |
+| MINECRAFT_API_USE_SUPABASE | Text | 기존 Minecraft 중계 사용 시 `true` |
+| SUPABASE_SERVICE_ROLE_KEY | Secret | 계정 관리 및 Minecraft 중계 |
+| MICROSOFT_CLIENT_SECRET | Secret | Microsoft 계정 연결 |
 
-```bash
-npx wrangler pages dev public
-```
+기존 Sites의 비밀값은 API로 다시 읽을 수 없습니다. 안전하게 보관한 원본에서 Worker에 직접 입력해야 합니다. 키를 변경하면 기존 서비스에도 영향이 있으므로 이전 완료 전에 임의로 회전하지 않습니다.
 
-다운로드한 Wrangler 설정을 사용하지 않고 일회성으로 바인딩을 전달하려면 KV/D1 바인딩과 프로젝트에서 사용하는 호환 날짜를 CLI 옵션으로 지정합니다.
+Microsoft 콜백 주소는 `https://web.libang.online/api/minecraft/callback`입니다. 기존 Supabase 사용자와 로그인 프로젝트를 유지합니다. Worker 도메인에서 로그인 테스트할 때는 Supabase 허용 리디렉션 URL도 확인하세요.
 
-```bash
-npx wrangler pages dev public --compatibility-date=2026-05-03 --kv=LB_DATA --d1 LB_DB=<D1_DATABASE_ID>
-```
-
-## Cloudflare Pages 배포
-
-GitHub 저장소 `kkaemok/libang-website`를 Pages 프로젝트에 연결한 상태에서 다음 빌드 구성을 유지합니다.
-
-| 설정 | 값 |
-| --- | --- |
-| Production branch | `main` |
-| Build command | 비움 |
-| Build output directory | `public` |
-| Root directory | 비움 |
-
-Pages 프로젝트의 **Settings > Bindings**에서 다음 바인딩을 Production과 Preview 환경에 필요한 범위로 추가합니다.
-
-| 바인딩 | 용도 |
-| --- | --- |
-| `LB_DATA` (KV namespace) | 사이트 편집 콘텐츠 |
-| `LB_DB` (D1 database) | 사용자 및 세션 |
-
-원격 D1에도 스키마를 적용합니다.
-
-```bash
-npx wrangler d1 execute <D1_DATABASE_NAME> --remote --file=./schema.sql
-```
-
-## API 엔드포인트
-
-- `POST /api/auth/signup`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-- `GET /api/auth/me`
-- `GET /api/auth/google/start`
-- `GET /api/auth/google/callback`
-- `GET|POST /api/servers`
-- `GET|POST /api/patch`
-- `GET|POST /api/team`
-- `GET|POST /api/site`
-
-## 관리자 편집
-
-1. `/auth/`에서 관리자 계정으로 로그인합니다.
-2. 각 페이지 상단의 편집 버튼을 누릅니다.
-3. 텍스트는 화면에서 직접 수정하고, 목록은 추가/삭제/순서 변경 후 저장합니다.
-4. 저장된 콘텐츠는 KV에 보관됩니다.
+기존 Pages 소스는 `archive/pages-before-workers` 브랜치에 보관되어 있습니다. 상세 기록과 운영 전환 조건은 [docs/migration.md](docs/migration.md)에 있습니다.

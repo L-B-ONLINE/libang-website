@@ -1,0 +1,8 @@
+# Copy to .dev.vars for local development only. Never commit real secrets.
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+MICROSOFT_CLIENT_ID=
+# Server-only secrets: set them on the Worker using the Cloudflare dashboard.
+SUPABASE_SERVICE_ROLE_KEY=
+MICROSOFT_CLIENT_SECRET=
+MINECRAFT_API_USE_SUPABASE=true

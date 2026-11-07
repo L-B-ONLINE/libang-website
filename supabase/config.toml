@@ -1,0 +1,2 @@
+[functions.minecraft-auth]
+verify_jwt = true

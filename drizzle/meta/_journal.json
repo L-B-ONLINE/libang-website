@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1789786307714,
+      "tag": "0000_fancy_krista_starr",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1790143257781,
+      "tag": "0001_blue_wasp",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1790143922759,
+      "tag": "0002_chief_the_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1790157515228,
+      "tag": "0003_secret_war_machine",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1790214678682,
+      "tag": "0004_faithful_bullseye",
+      "breakpoints": true
+    }
+  ]
+}
