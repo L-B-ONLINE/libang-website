@@ -23,7 +23,7 @@ pnpm build
 
 ```sh
 pnpm build
-pnpm deploy
+pnpm run deploy
 ```
 
 기본 대상은 `libang-website` / `libang-production`입니다. 별도 시험 환경은 `CLOUDFLARE_ENV=preview pnpm build`로 빌드하며 `libang-website-preview` / `libang-preview`를 사용합니다. 시험 환경에는 운영 개인정보를 복제하지 않습니다.
