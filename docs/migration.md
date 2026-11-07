@@ -48,3 +48,10 @@
 - 새 키는 JWT가 아니므로 기존 Bearer 전달 방식에 단순히 값만 교체하지 않음. Edge Function의 `apikey` 헤더와 자체 인증을 공식 문서에 맞춰 검증.
 - 새 키 전환과 로그인·관리자·Minecraft 연결 확인을 마친 후에만 구형 키 비활성화. JWT signing secret의 무계획한 회전은 기존 세션에 영향을 줄 수 있으므로 별도 검토.
 - 참고: https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys
+
+### 설정 후 연결 점검
+
+- 제공된 service_role 키로 Supabase 관리자 API의 읽기 요청 HTTP 200 확인.
+- 기존 배포된 `minecraft-auth` 함수의 health 호출은 HTTP 401 / `unauthorized`. 플랫폼 관리자 API 키의 유효성과 중계 함수의 고정 키 비교 결과가 다르므로 인증 설정 불일치를 추가 점검해야 함.
+- Edge Function v2 소스를 읽어, 런타임 `SUPABASE_SERVICE_ROLE_KEY` 및 `SUPABASE_SECRET_KEYS` 값과 요청 토큰을 정확 비교하는 기존 구현임을 확인. 인증을 우회하거나 기존 키를 폐기하는 변경은 하지 않음.
+- 전체 이전 완료 전 Microsoft 연결 및 Minecraft 중계의 실제 성공 검증이 필요.
