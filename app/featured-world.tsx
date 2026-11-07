@@ -1,4 +1,5 @@
 "use client";
+import Link from "@/components/site-link";
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Pause, Play } from "@/components/site-icons";
@@ -58,7 +59,7 @@ export default function FeaturedWorld() {
         <span className="world-status"><span />{current.status} · {current.genre}</span>
         <h2>{current.name}</h2>
         <p>{current.tagline}</p>
-        <a href={`/servers/${current.slug}`} className="world-detail">서버 알아보기 <ArrowUpRight size={18} /></a>
+        <Link href={`/servers/${current.slug}`} className="world-detail">서버 알아보기 <ArrowUpRight size={18} /></Link>
       </div>
       <span className="art-credit">리뱅 월드 · 컨셉 일러스트</span>
     </div>

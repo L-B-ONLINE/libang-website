@@ -1,16 +1,16 @@
 export const servers = [
   {
-    slug: "dongwon", name: "Dongwon", genre: "캐주얼 RPG", status: "운영 중",
-    tagline: "퀘스트를 따라, 한 걸음씩 새로운 모험.",
-    description: "퀘스트를 진행하며 캐릭터를 성장시키는 RPG.",
-    tags: ["퀘스트", "모험", "성장"], imagePosition: "4% 60%",
-    guide: "처음 접속했다면 로비에서 Dongwon을 선택하세요. 서버 내 첫 안내를 따라 퀘스트를 시작할 수 있습니다.",
+    slug: "dongwon", name: "Dongwon", genre: "평화야생", status: "운영 중",
+    tagline: "평화로운 야생에서 시작해, 더 넓은 모험으로.",
+    description: "현재는 평화야생 서버로 운영하며, 추후 RPG 콘텐츠로 확장할 예정입니다.",
+    tags: ["평화야생", "생존", "RPG 확장 예정"], imagePosition: "4% 60%",
+    guide: "처음 접속했다면 로비에서 Dongwon을 선택하세요. 서버 내 안내를 따라 평화야생을 시작하세요. RPG 콘텐츠는 추후 추가될 예정입니다.",
   },
   {
-    slug: "lokawar", name: "LokaWar", genre: "국가 · 전쟁", status: "개발 중",
-    tagline: "함께 세운 국가, 직접 지켜내는 영토.",
-    description: "국가를 세우고 영토를 두고 경쟁하는 전쟁 서버.",
-    tags: ["국가", "영토", "전쟁"], imagePosition: "95% 40%",
+    slug: "bose", name: "Bose", genre: "반야생", status: "개발 중",
+    tagline: "야생에서 살아남으며 만들어가는 나만의 이야기.",
+    description: "야생에서 자원을 모으고 생존을 즐기는 반야생 서버.",
+    tags: ["반야생", "생존", "탐험"], imagePosition: "95% 40%",
     guide: "현재 개발 중입니다. 공개 일정과 플레이 안내는 포럼의 공지에서 확인할 수 있습니다.",
   },
   {

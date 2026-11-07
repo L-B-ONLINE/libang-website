@@ -1,4 +1,5 @@
 "use client";
+import Link from "@/components/site-link";
 import { useState } from "react";
 import { useAuth } from "../auth-provider";
 import { PlayerName } from "../player-identity";
@@ -9,7 +10,7 @@ export default function AccountSettings() {
   const [busy,setBusy] = useState<Field | null>(null);
   const [messages,setMessages] = useState<Partial<Record<Field,string>>>({});
   if(loading) return <p className="auth-status">불러오는 중…</p>;
-  if(!client || !session) return <p className="auth-status">로그인이 필요합니다. <a href="/login">로그인</a></p>;
+  if(!client || !session) return <p className="auth-status">로그인이 필요합니다. <Link href="/login">로그인</Link></p>;
   const currentName = session.user.user_metadata?.username || session.user.user_metadata?.full_name || "미설정";
   async function save(event:React.FormEvent,field:Field) {
     event.preventDefault(); if(!client || busy) return;

@@ -1,4 +1,5 @@
 "use client";
+import Link from "@/components/site-link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogPortal, DialogTitle } from "@/components/ui/dialog";
@@ -105,23 +106,23 @@ export default function ForumClient({ posts, signedIn, isAdmin, signInPath, init
   }
 
   return <>
-    <div className="forum-title-actions">{effectiveSignedIn ? <button type="button" className="btn btn-primary" onClick={openComposer}><Pencil size={18}/>글쓰기</button> : <a className="btn btn-primary" href={signInPath}><Pencil size={18}/>글쓰기</a>}</div>
+    <div className="forum-title-actions">{effectiveSignedIn ? <button type="button" className="btn btn-primary" onClick={openComposer}><Pencil size={18}/>글쓰기</button> : <Link className="btn btn-primary" href={signInPath}><Pencil size={18}/>글쓰기</Link>}</div>
     <div className="topic-tabs" role="group" aria-label="포럼 주제" ref={tabsRef}>
       {(["all", "notice", "free", "question", "development", "gaming", "daily"] as const).map((item) => <button aria-pressed={filter === item} className={filter === item ? "active" : ""} key={item} onClick={() => { setFilter(item); setPage(1); }} type="button">{item === "all" ? "전체" : labels[item]}</button>)}
       {tabIndicator && <span aria-hidden="true" className="topic-indicator" style={{ width: tabIndicator.width, transform: `translateX(${tabIndicator.left}px)` }} />}
     </div>
     <div className="forum-toolbar"><label className="forum-search"><Search size={17} /><span className="sr-only">제목, 내용, 작성자 검색</span><input type="search" value={query} onChange={event => { setQuery(event.target.value); setPage(1); }} placeholder="제목, 내용, 작성자 검색" />{query && <button type="button" aria-label="검색어 지우기" onClick={() => { setQuery(""); setPage(1); }}><X size={16} /></button>}</label><div className="forum-sort"><span role="status">{visible.length}개의 글</span><button className="forum-sort-icon" type="button" aria-label={sort === "newest" ? "최신순, 오래된순으로 변경" : "오래된순, 최신순으로 변경"} title={sort === "newest" ? "최신순" : "오래된순"} onClick={()=>{setSort(sort === "newest" ? "oldest" : "newest");setPage(1);}}>{sort === "newest" ? <ArrowDownWideNarrow size={18}/> : <ArrowUpNarrowWide size={18}/>}</button></div></div>
     <section className="post-list">
-      {pagePosts.length ? pagePosts.map((post) => <a className={`post-row${post.id === pinnedId ? " pinned" : ""}`} href={`/forum/${post.id}`} key={post.id}>
+      {pagePosts.length ? pagePosts.map((post) => <Link className={`post-row${post.id === pinnedId ? " pinned" : ""}`} href={`/forum/${post.id}`} key={post.id}>
         <span className={`category category-${post.category}`}>{labels[post.category]}</span>
         <span className="post-copy"><strong>{post.id === pinnedId && <><Pin size={14} aria-hidden="true" /><span className="sr-only">고정 공지: </span></>}{post.title}</strong><span>{post.content}</span></span>
         <span className="post-meta"><PlayerName userId={post.authorId} name={post.authorName}/><span className="post-date">{new Date(post.createdAt).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}{post.updatedAt && <> · 수정됨</>}</span></span>
-      </a>) : <div className="empty">{unavailable ? "글을 불러오지 못했습니다. 잠시 후 다시 확인해주세요." : query ? "검색 결과가 없습니다." : "아직 작성된 글이 없습니다."}{unavailable && <button type="button" onClick={() => router.refresh()}>다시 불러오기</button>}{query && <button type="button" onClick={() => { setQuery(""); setPage(1); }}>검색 초기화</button>}</div>}
+      </Link>) : <div className="empty">{unavailable ? "글을 불러오지 못했습니다. 잠시 후 다시 확인해주세요." : query ? "검색 결과가 없습니다." : "아직 작성된 글이 없습니다."}{unavailable && <button type="button" onClick={() => router.refresh()}>다시 불러오기</button>}{query && <button type="button" onClick={() => { setQuery(""); setPage(1); }}>검색 초기화</button>}</div>}
     </section>
     {totalPages > 1 && <nav className="forum-pagination" aria-label="포럼 페이지"><button type="button" disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}><ArrowLeft size={15} />이전</button><span>{currentPage} / {totalPages}</span><button type="button" disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>다음<ArrowRight size={15} /></button></nav>}
     {effectiveSignedIn
       ? <button className={`compose-fab${penTilt ? " pen-tilt" : ""}`} type="button" aria-label="글 작성" onClick={openComposer}><Pencil aria-hidden="true" /></button>
-      : <a className="compose-fab" href={signInPath} target="_top" aria-label="로그인하고 글 작성"><Pencil aria-hidden="true" /></a>}
+      : <Link className="compose-fab" href={signInPath} target="_top" aria-label="로그인하고 글 작성"><Pencil aria-hidden="true" /></Link>}
     <Dialog open={open} onOpenChange={(value) => { if (!sending) setOpen(value); }}><DialogPortal>
       <DialogPrimitive.Overlay className="composer-overlay" />
       <DialogPrimitive.Content className="composer" aria-describedby={undefined}>

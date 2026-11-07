@@ -1,3 +1,4 @@
+import Link from "@/components/site-link";
 import { ArrowLeft } from "@/components/site-icons";
 import { notFound } from 'next/navigation';
 import { getPost } from '../../../db/forum';
@@ -9,5 +10,5 @@ export const dynamic='force-dynamic';
 export default async function PostPage({params}:{params:Promise<{id:string}>}){
   const id=Number((await params).id);if(!Number.isInteger(id)||id<1)notFound();
   const post=await getPost(id);if(!post)notFound();
-  return <PageFrame title={post.title} actions={<a className="text-link" href="/forum"><ArrowLeft size={16} />목록으로</a>} className="post-page"><article className="post-detail"><div className="detail-meta"><span className={`category category-${post.category}`}>{labels[post.category]}</span><PlayerName userId={post.authorId} name={post.authorName}/><time>{post.createdAt.toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}</time>{post.updatedAt&&<span>수정됨</span>}</div><div className="detail-content">{post.content}</div><PostActions id={post.id} authorId={post.authorId} initialCategory={post.category} initialTitle={post.title} initialContent={post.content}/></article></PageFrame>;
+  return <PageFrame title={post.title} actions={<Link className="text-link" href="/forum"><ArrowLeft size={16} />목록으로</Link>} className="post-page"><article className="post-detail"><div className="detail-meta"><span className={`category category-${post.category}`}>{labels[post.category]}</span><PlayerName userId={post.authorId} name={post.authorName}/><time>{post.createdAt.toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})}</time>{post.updatedAt&&<span>수정됨</span>}</div><div className="detail-content">{post.content}</div><PostActions id={post.id} authorId={post.authorId} initialCategory={post.category} initialTitle={post.title} initialContent={post.content}/></article></PageFrame>;
 }

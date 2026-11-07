@@ -2,11 +2,14 @@
 import { createContext,useContext,useEffect,useState,useRef,type ReactNode } from "react";
 import type { PublicPlayer } from "../lib/player-profile";
 const Context=createContext<Record<string,PublicPlayer>>({});
+const LoadingContext=createContext(true);
 export function PlayerIdentityProvider({children}:{children:ReactNode}) {
  const [profiles,setProfiles]=useState<Record<string,PublicPlayer>>({});
- useEffect(()=>{let active=true;let controller:AbortController|null=null;const refresh=()=>{controller?.abort();controller=new AbortController();void fetch("/api/player-profile",{signal:controller.signal,cache:"no-store"}).then(async r=>r.ok ? await r.json() as {profiles:Record<string,PublicPlayer>} : null).then(d=>{if(active && d)setProfiles(d.profiles);}).catch(()=>{});};refresh();window.addEventListener("player-profile-updated",refresh);return()=>{active=false;controller?.abort();window.removeEventListener("player-profile-updated",refresh);};},[]);
- return <Context.Provider value={profiles}>{children}</Context.Provider>;
+ const [loading,setLoading]=useState(true);
+ useEffect(()=>{let active=true;let controller:AbortController|null=null;const refresh=()=>{controller?.abort();const requestController=new AbortController();controller=requestController;void fetch("/api/player-profile",{signal:requestController.signal,cache:"no-store"}).then(async r=>r.ok ? await r.json() as {profiles:Record<string,PublicPlayer>} : null).then(d=>{if(active && d)setProfiles(d.profiles);}).catch(()=>{}).finally(()=>{if(active && !requestController.signal.aborted)setLoading(false);});};refresh();window.addEventListener("player-profile-updated",refresh);return()=>{active=false;controller?.abort();window.removeEventListener("player-profile-updated",refresh);};},[]);
+ return <LoadingContext.Provider value={loading}><Context.Provider value={profiles}>{children}</Context.Provider></LoadingContext.Provider>;
 }
+export function usePlayerIdentityLoading(){return useContext(LoadingContext);}
 export function usePlayerIdentity(userId?:string){const profiles=useContext(Context);return userId ? profiles[userId] : undefined;}
 export function SkinFace({skinUrl,className="",fallback=null}:{skinUrl:string;className?:string;fallback?:ReactNode}) {
  const [failed,setFailed]=useState(false);

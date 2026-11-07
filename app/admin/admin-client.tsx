@@ -1,4 +1,5 @@
 "use client";
+import Link from "@/components/site-link";
 
 import { useCallback } from "react";
 import { useAuth } from "../auth-provider";
@@ -17,6 +18,6 @@ export default function AdminClient() {
     return result;
   }, [token]);
   if (loading) return <p className="admin-state" role="status">관리 권한을 확인하는 중…</p>;
-  if (!session) return <div className="admin-state"><p>관리자 계정으로 로그인하세요.</p><a className="btn" href="/login">로그인</a></div>;
+  if (!session) return <div className="admin-state"><p>관리자 계정으로 로그인하세요.</p><Link className="btn" href="/login">로그인</Link></div>;
   return <AdminWorkspace key={session.user.id} request={request} />;
 }

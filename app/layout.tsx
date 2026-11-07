@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" data-theme="dark" suppressHydrationWarning>
+    <html lang="ko" data-theme="light" suppressHydrationWarning>
       <head><link rel="preload" href="/fonts/pretendard-ko-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" /><script dangerouslySetInnerHTML={{ __html: 'try{var t=localStorage.getItem("lb-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;else if(t==="system")delete document.documentElement.dataset.theme}catch{}' }} /></head>
       <body><AuthProvider><PlayerIdentityProvider><a className="skip-link" href="#main-content">본문으로 이동</a><SiteHeader /><div id="main-content">{children}</div><SiteFooter /></PlayerIdentityProvider></AuthProvider></body>
     </html>

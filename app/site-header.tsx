@@ -1,11 +1,12 @@
 "use client";
+import Link from "@/components/site-link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowRight, LogIn, LogOut, Settings, Shield, UserPlus } from "@/components/site-icons";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "./auth-provider";
-import { SkinFace, PlayerName, usePlayerIdentity } from "./player-identity";
+import { SkinFace, PlayerName, usePlayerIdentity, usePlayerIdentityLoading } from "./player-identity";
 import { UserRound as AccountIcon } from "@/components/site-icons";
 
 const links = [{ href: "/servers", label: "서버" }, { href: "/forum", label: "포럼" }, { href: "/guide", label: "가이드" }];
@@ -13,10 +14,11 @@ type Theme = "system" | "light" | "dark";
 export default function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { session, client } = useAuth();
+  const { session, client, loading: authLoading } = useAuth();
+  const identityLoading = usePlayerIdentityLoading();
   const player = usePlayerIdentity(session?.user.id);
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [owner, setOwner] = useState<{ token: string; value: boolean } | null>(null);
   const [easterVisible, setEasterVisible] = useState(false);
   const clicks = useRef({ count: 0, last: 0 });
@@ -55,13 +57,13 @@ export default function SiteHeader() {
   }
   return <>
     <header className="site-header"><div className="shell header-line">
-      <a href="/" className="brand" aria-label="L.B ONLINE 홈" onClick={brandClick}><img src="/brand.png" alt="" width="34" height="25" /><span className="brand-word">L.B <span>ONLINE</span></span></a>
-      <nav className="main-nav" aria-label="주 메뉴">{links.map(link => <a key={link.href} href={link.href} aria-current={pathname.startsWith(link.href) ? "page" : undefined}>{link.label}</a>)}</nav>
-      <div className="header-utilities"><a href="/guide#connect" className="header-connect">접속하기 <ArrowRight size={16} /></a>
-        <DropdownMenu open={open} onOpenChange={setOpen} modal={false}><DropdownMenuTrigger asChild><button type="button" className="account-trigger" aria-label="계정 메뉴" title="계정 메뉴">{player?.skinUrl ? <SkinFace key={player.skinUrl} skinUrl={player.skinUrl} fallback={<AccountIcon size={18}/>}/> : <AccountIcon size={18} />}{session && <span className="signed-in-indicator" />}</button></DropdownMenuTrigger>
+      <Link href="/" className="brand" aria-label="L.B ONLINE 홈" onClick={brandClick}><img src="/brand.png" alt="" width="34" height="25" /><span className="brand-word">L.B <span>ONLINE</span></span></Link>
+      <nav className="main-nav" aria-label="주 메뉴">{links.map(link => <Link key={link.href} href={link.href} aria-current={pathname.startsWith(link.href) ? "page" : undefined}>{link.label}</Link>)}</nav>
+      <div className="header-utilities"><Link href="/guide#connect" className="header-connect">접속하기 <ArrowRight size={16} /></Link>
+        <DropdownMenu open={open} onOpenChange={setOpen} modal={false}><DropdownMenuTrigger asChild><button type="button" className="account-trigger" aria-label="계정 메뉴" title="계정 메뉴">{authLoading || identityLoading ? <span aria-hidden="true" style={{ width: 18, height: 18 }} /> : player?.skinUrl ? <SkinFace key={player.skinUrl} skinUrl={player.skinUrl} fallback={<AccountIcon size={18}/>}/> : <AccountIcon size={18} />}{session && <span className="signed-in-indicator" />}</button></DropdownMenuTrigger>
           <DropdownMenuContent align="end" sideOffset={10} collisionPadding={16} className="account-dropdown">
             <DropdownMenuLabel className="account-identity"><strong>{session ? <PlayerName userId={session.user.id} name={name}/> : "리뱅 계정"}</strong>{session && <span>{session.user.email}</span>}</DropdownMenuLabel>
-            <DropdownMenuGroup>{session ? <><DropdownMenuItem asChild className="account-item"><a href="/profile"><AccountIcon size={17}/>프로필 보기</a></DropdownMenuItem><DropdownMenuItem asChild className="account-item"><a href="/account"><Settings size={17} />계정 설정</a></DropdownMenuItem>{isOwner && <DropdownMenuItem asChild className="account-item"><a href="/admin"><Shield size={17} />관리자</a></DropdownMenuItem>}</> : <><DropdownMenuItem asChild className="account-item"><a href="/login"><LogIn size={17} />로그인</a></DropdownMenuItem><DropdownMenuItem asChild className="account-item"><a href="/login?mode=signup"><UserPlus size={17} />가입하기</a></DropdownMenuItem></>}</DropdownMenuGroup>
+            <DropdownMenuGroup>{session ? <><DropdownMenuItem asChild className="account-item"><Link href="/profile"><AccountIcon size={17}/>프로필 보기</Link></DropdownMenuItem><DropdownMenuItem asChild className="account-item"><Link href="/account"><Settings size={17} />계정 설정</Link></DropdownMenuItem>{isOwner && <DropdownMenuItem asChild className="account-item"><Link href="/admin"><Shield size={17} />관리자</Link></DropdownMenuItem>}</> : <><DropdownMenuItem asChild className="account-item"><Link href="/login"><LogIn size={17} />로그인</Link></DropdownMenuItem><DropdownMenuItem asChild className="account-item"><Link href="/login?mode=signup"><UserPlus size={17} />가입하기</Link></DropdownMenuItem></>}</DropdownMenuGroup>
             <DropdownMenuSeparator className="account-separator" /><DropdownMenuLabel className="appearance-label">화면 모드</DropdownMenuLabel>
             <DropdownMenuRadioGroup value={theme} onValueChange={setAppearance} className="appearance-options">{[{ key: "light", label: "라이트" }, { key: "dark", label: "다크" }, { key: "system", label: "자동" }].map(item => <DropdownMenuRadioItem key={item.key} value={item.key} className="appearance-choice" onSelect={event => event.preventDefault()}>{item.label}</DropdownMenuRadioItem>)}</DropdownMenuRadioGroup>
             {session && <><DropdownMenuSeparator className="account-separator" /><DropdownMenuItem className="account-item signout-item" onSelect={() => { void client?.auth.signOut(); }}><LogOut size={17} />로그아웃</DropdownMenuItem></>}
