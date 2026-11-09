@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: "L.B ONLINE",
   metadataBase: new URL("https://web.libang.online"),
   icons: { icon: "/brand.png", apple: "/brand.png" },
-  openGraph: { title: "L.B ONLINE", description: "리뱅 온라인. Minecraft 서버, 가이드, 커뮤니티.", images: [{ url: "/images/dongwon-world.webp", width: 960, height: 1707, alt: "마인크래프트 월드 풍경" }] },
+  openGraph: { title: "L.B ONLINE", description: "리뱅 온라인. Minecraft 서버, 가이드, 커뮤니티.", images: [{ url: "/brand.png", alt: "리뱅 온라인 로고" }] },
   description: "L.B ONLINE 마인크래프트 서버 네트워크. 서버 접속, 플레이 가이드, 자유글과 질문을 확인하세요.",
 };
 
