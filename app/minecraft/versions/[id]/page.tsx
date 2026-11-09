@@ -6,6 +6,7 @@ import PageFrame from "../../../page-frame";
 import { loadMinecraftVersion } from "@/lib/minecraft-data";
 import { channelLabels, channelDescriptions, minecraftDate, versionChannel } from "@/lib/minecraft-catalog";
 import CatalogStatus from "../../catalog-status";
+import { BookmarkButton } from "../../../bookmarks-provider";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Minecraft 버전 정보 | L.B ONLINE" };
@@ -20,7 +21,7 @@ export default async function VersionPage({ params }: { params: Promise<{ id: st
   if (!data) notFound();
   const { version, download } = data;
   const channel = versionChannel(version);
-  return <PageFrame title={[version.id, version.updateName].filter(Boolean).join(" ")} className="minecraft-page" actions={<Link className="text-link" href="/minecraft/versions"><ArrowLeft size={17}/>버전 목록</Link>}>
+  return <PageFrame title={[version.id, version.updateName].filter(Boolean).join(" ")} className="minecraft-page" actions={<><BookmarkButton kind="version" resourceId={version.id} title={[version.id, version.updateName].filter(Boolean).join(" ")} href={`/minecraft/versions/${encodeURIComponent(version.id)}`}/><Link className="text-link" href="/minecraft/versions"><ArrowLeft size={17}/>버전 목록</Link></>}>
     {version.image && <img className="mc-version-hero" src={version.image.url} alt={version.image.alt} width={960} height={540} fetchPriority="high" decoding="async"/>}
     <header className="mc-version-intro"><span className="mc-eyebrow">MINECRAFT / JAVA EDITION</span><div><span className={`mc-badge mc-badge-${channel}`}>{channelLabels[channel]}</span>{id === data.latestRelease && <span className="mc-latest-label">최신 정식 버전</span>}</div><p>Java Edition 공식 배포 정보</p></header>
     <div className="mc-channel-explanation"><h2>{channelLabels[channel]}</h2><p>{channelDescriptions[channel]}</p></div>

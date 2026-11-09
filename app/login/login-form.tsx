@@ -2,18 +2,20 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../auth-provider";
+import { safeReturnPath } from "@/lib/portal-types";
 
 export default function LoginForm() {
   const { client, session, loading, configured, error: configError } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const returnTo = searchParams.has("return_to") ? safeReturnPath(searchParams.get("return_to")) : "/forum";
   const [signup, setSignup] = useState(searchParams.get("mode") === "signup");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  useEffect(() => { if (session) router.replace("/forum"); }, [router, session]);
+  useEffect(() => { if (session) router.replace(returnTo); }, [router, session, returnTo]);
   async function submit(event: React.FormEvent) {
     event.preventDefault(); if (!client || busy) return;
     setBusy(true); setMessage("");
@@ -23,18 +25,18 @@ export default function LoginForm() {
           password,
           options: {
             data: { username: username.trim(), full_name: username.trim() },
-            emailRedirectTo: `${window.location.origin}/forum`,
+            emailRedirectTo: `${window.location.origin}${returnTo}`,
           },
         })
       : await client.auth.signInWithPassword({ email: email.trim(), password });
     setBusy(false);
     if (result.error) setMessage(result.error.message);
     else if (signup && !result.data.session) setMessage("확인 메일을 보냈습니다.");
-    else router.replace("/forum");
+    else router.replace(returnTo);
   }
   async function oauth(provider: "google" | "discord") {
     if (!client) return; setMessage("");
-    const { error } = await client.auth.signInWithOAuth({ provider, options: { redirectTo: `${window.location.origin}/forum` } });
+    const { error } = await client.auth.signInWithOAuth({ provider, options: { redirectTo: `${window.location.origin}${returnTo}` } });
     if (error) setMessage(error.message);
   }
   if (loading) return <><h1 className="page-title">{signup ? "가입하기" : "로그인"}</h1><p className="auth-status">로그인을 준비하는 중…</p></>;

@@ -57,3 +57,6 @@ export const Trash = sized(RawTrash);
 export const Save = sized(RawCheck);
 export const CheckIcon = Check;
 export const XIcon = X;
+export function Bookmark({ size = 20, ...props }: IconProps) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}><path d="M6 4.5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v16l-6-3.5-6 3.5z"/></svg>;
+}

@@ -7,6 +7,7 @@ import { useAuth } from "../auth-provider";
 import type { GuideKey } from "../../db/guide";
 import CopyAddress from "../copy-address";
 import PageFrame from "../page-frame";
+import { BookmarkButton } from "../bookmarks-provider";
 
 const sections: { id: GuideKey; title: string; group: string }[] = [
   { id: "connect", title: "서버 접속 방법", group: "시작하기" },
@@ -89,7 +90,7 @@ export default function GuideClient({ initialContent }: { initialContent: Record
   return <PageFrame title="가이드" className="guide-page" actions={<Link href="/forum?category=question" className="text-link">포럼에서 질문하기 <ArrowRight size={17} /></Link>}>
     <div className="guide-layout"><aside className="guide-navigation"><nav aria-label="가이드 문서">{groups.map(group => <div className="guide-nav-group" key={group}><span>{group}</span>{sections.filter(section => section.group === group).map(section => <button key={section.id} type="button" aria-current={active === section.id ? "page" : undefined} onClick={() => choose(section.id)}>{section.title}</button>)}</div>)}</nav></aside>
       <div className="guide-mobile-select"><BookOpen size={18} /><label className="sr-only" htmlFor="guide-document">가이드 문서 선택</label><select id="guide-document" value={active} disabled={busy} onChange={event => choose(event.target.value as GuideKey)}>{groups.map(group => <optgroup label={group} key={group}>{sections.filter(section => section.group === group).map(section => <option value={section.id} key={section.id}>{section.title}</option>)}</optgroup>)}</select></div>
-      <div className="guide-reading"><article aria-labelledby="guide-article-title"><div className="reading-header"><h2 id="guide-article-title">{current.title}</h2>{admin && !editing && <button type="button" className="guide-edit" onClick={() => { setEditing(active); setDraft(content[active]); setError(""); }}><Pencil size={14} />수정</button>}</div>
+      <div className="guide-reading"><article aria-labelledby="guide-article-title"><div className="reading-header"><h2 id="guide-article-title">{current.title}</h2><BookmarkButton kind="guide" resourceId={active} compact title={current.title} href={`/guide#${active === "lokawar" ? "bose" : active}`}/>{admin && !editing && <button type="button" className="guide-edit" onClick={() => { setEditing(active); setDraft(content[active]); setError(""); }}><Pencil size={14} />수정</button>}</div>
         {active === "connect" && <div className="guide-address"><div><span>서버 주소</span><strong>libang.online</strong></div><CopyAddress /></div>}
         {editing === active ? <form className="guide-editor" onSubmit={event => { event.preventDefault(); void save(); }}><label htmlFor="guide-draft">가이드 내용</label><textarea id="guide-draft" value={draft} required maxLength={5000} onChange={event => setDraft(event.target.value)} />{error && <p className="form-error" role="alert">{error}</p>}<div className="guide-editor-actions"><button type="button" disabled={busy} onClick={() => setEditing(null)}>취소</button><button type="submit" disabled={busy || !draft.trim()}>{busy ? "저장 중…" : "변경 저장"}</button></div></form> : <GuideText key={active} text={content[active]} connect={active === "connect"} />}
 

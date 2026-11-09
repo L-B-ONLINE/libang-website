@@ -3,17 +3,19 @@ import Link from "@/components/site-link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowRight, LogIn, LogOut, Settings, Shield, UserPlus } from "@/components/site-icons";
+import { ArrowRight, Bookmark, LogIn, LogOut, Search, Settings, Shield, UserPlus } from "@/components/site-icons";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "./auth-provider";
 import { SkinFace, PlayerName, usePlayerIdentity, usePlayerIdentityLoading } from "./player-identity";
 import { UserRound as AccountIcon } from "@/components/site-icons";
+import { useSiteSearch } from "./search-provider";
 
 const links = [{ href: "/servers", label: "서버" }, { href: "/forum", label: "포럼" }, { href: "/guide", label: "가이드" }, { href: "/minecraft", label: "마인크래프트" }];
 type Theme = "system" | "light" | "dark";
 export default function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
+  const search = useSiteSearch();
   const { session, client, loading: authLoading } = useAuth();
   const identityLoading = usePlayerIdentityLoading();
   const player = usePlayerIdentity(session?.user.id);
@@ -29,6 +31,11 @@ export default function SiteHeader() {
   const name = String(session?.user.user_metadata?.username || session?.user.user_metadata?.full_name || "내 계정");
   useEffect(() => { try { const saved = localStorage.getItem("lb-theme"); if (saved === "dark" || saved === "light" || saved === "system") setTheme(saved); } catch {} }, []);
   useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    const close = () => { setOpen(false); setMobileMenuOpen(false); };
+    window.addEventListener("libang:close-menus", close);
+    return () => window.removeEventListener("libang:close-menus", close);
+  }, []);
   useEffect(() => {
     const media = window.matchMedia("(max-width:760px)");
     const closeDesktopMenu = () => { if (!media.matches) setMobileMenuOpen(false); };
@@ -69,14 +76,16 @@ export default function SiteHeader() {
       <nav className="main-nav" aria-label="주 메뉴">{links.map(link => <Link key={link.href} href={link.href} aria-current={pathname.startsWith(link.href) ? "page" : undefined}>{link.label}</Link>)}</nav>
       <div className="header-utilities"><Link href="/guide#connect" className="header-connect">접속하기 <ArrowRight size={16} /></Link>
         <DropdownMenu open={open} onOpenChange={value => { setOpen(value); if (value) setMobileMenuOpen(false); }} modal={false}><DropdownMenuTrigger asChild><button type="button" className="account-trigger" aria-label="계정 메뉴" title="계정 메뉴">{authLoading || identityLoading ? <span aria-hidden="true" style={{ width: 18, height: 18 }} /> : player?.skinUrl ? <SkinFace key={player.skinUrl} skinUrl={player.skinUrl} fallback={<AccountIcon size={18}/>}/> : <AccountIcon size={18} />}{session && <span className="signed-in-indicator" />}</button></DropdownMenuTrigger>
-          <DropdownMenuContent align="end" sideOffset={10} collisionPadding={16} className="account-dropdown">
+          <DropdownMenuContent align="end" sideOffset={10} collisionPadding={16} className="account-dropdown" onCloseAutoFocus={event => { if (search.open) event.preventDefault(); }}>
             <DropdownMenuLabel className="account-identity"><strong>{session ? <PlayerName userId={session.user.id} name={name}/> : "리뱅 계정"}</strong>{session && <span>{session.user.email}</span>}</DropdownMenuLabel>
             <DropdownMenuGroup>{session ? <><DropdownMenuItem asChild className="account-item"><Link href="/profile"><AccountIcon size={17}/>프로필 보기</Link></DropdownMenuItem><DropdownMenuItem asChild className="account-item"><Link href="/account"><Settings size={17} />계정 설정</Link></DropdownMenuItem>{isOwner && <DropdownMenuItem asChild className="account-item"><Link href="/admin"><Shield size={17} />관리자</Link></DropdownMenuItem>}</> : <><DropdownMenuItem asChild className="account-item"><Link href="/login"><LogIn size={17} />로그인</Link></DropdownMenuItem><DropdownMenuItem asChild className="account-item"><Link href="/login?mode=signup"><UserPlus size={17} />가입하기</Link></DropdownMenuItem></>}</DropdownMenuGroup>
+            <DropdownMenuItem asChild className="account-item"><Link href="/saved"><Bookmark size={17}/>내 보관함</Link></DropdownMenuItem>
             <DropdownMenuSeparator className="account-separator" /><DropdownMenuLabel className="appearance-label">화면 모드</DropdownMenuLabel>
             <DropdownMenuRadioGroup value={theme} onValueChange={setAppearance} className="appearance-options">{[{ key: "light", label: "라이트" }, { key: "dark", label: "다크" }, { key: "system", label: "자동" }].map(item => <DropdownMenuRadioItem key={item.key} value={item.key} className="appearance-choice" onSelect={event => event.preventDefault()}>{item.label}</DropdownMenuRadioItem>)}</DropdownMenuRadioGroup>
             {session && <><DropdownMenuSeparator className="account-separator" /><DropdownMenuItem className="account-item signout-item" onSelect={() => { void client?.auth.signOut(); }}><LogOut size={17} />로그아웃</DropdownMenuItem></>}
           </DropdownMenuContent>
         </DropdownMenu>
+        <button className="header-search-toggle" type="button" aria-label="통합 검색 열기" title="통합 검색 (Ctrl+K / ⌘K)" onClick={search.show}><Search size={19}/><kbd>Ctrl K</kbd></button>
         <DropdownMenu open={mobileMenuOpen} onOpenChange={value => { setMobileMenuOpen(value); if (value) setOpen(false); }} modal={false}>
           <DropdownMenuTrigger asChild><button ref={mobileMenuTrigger} className="mobile-menu-toggle" type="button" aria-label={mobileMenuOpen ? "주 메뉴 닫기" : "주 메뉴 열기"}><span aria-hidden="true"/><span aria-hidden="true"/></button></DropdownMenuTrigger>
           <DropdownMenuContent className="mobile-nav-popup" aria-label="주 메뉴" aria-labelledby={undefined} align="end" sideOffset={15} collisionPadding={20} onCloseAutoFocus={event => event.preventDefault()} onEscapeKeyDown={() => mobileMenuTrigger.current?.focus()}>

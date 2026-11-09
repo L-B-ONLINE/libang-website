@@ -36,6 +36,13 @@
       "when": 1790214678682,
       "tag": "0004_faithful_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794233591807,
+      "tag": "0005_portal_features",
+      "breakpoints": true
     }
   ]
 }

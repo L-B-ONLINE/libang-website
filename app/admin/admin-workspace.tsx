@@ -6,13 +6,16 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Check, Copy, LayoutDashb
 import type { AdminAccount, AdminGuide, AdminOverview, AdminPost } from "@/lib/admin-types";
 
 import { PlayerName } from "../player-identity";
+import { ServerBridgeAdmin, ServerUpdatesAdmin } from "./server-tools";
 export type AdminRequest = <T>(path: string, init?: RequestInit) => Promise<T>;
-type Section = "overview" | "accounts" | "posts" | "guides";
+type Section = "overview" | "accounts" | "posts" | "guides" | "server-updates" | "server-bridge";
 const sections = [
   { id: "overview", label: "개요", icon: LayoutDashboard },
   { id: "accounts", label: "계정", icon: Users },
   { id: "posts", label: "게시물", icon: MessageSquare },
   { id: "guides", label: "가이드", icon: BookOpen },
+  { id: "server-updates", label: "서버 소식", icon: MessageSquare },
+  { id: "server-bridge", label: "서버 연동", icon: Shield },
 ] as const;
 const roles = { owner: "관리자", subadmin: "부관리자", member: "일반 회원" };
 const topics = { notice: "공지", free: "자유", question: "질문", development: "개발", gaming: "게임", daily: "일상" };
@@ -64,6 +67,8 @@ export default function AdminWorkspace({ request }: { request: AdminRequest }) {
       {section === "accounts" && <Accounts key={revision} request={request} onDirty={setDirty} />}
       {section === "posts" && <Posts key={revision} request={request} onDirty={setDirty} />}
       {section === "guides" && <Guides key={revision} request={request} onDirty={setDirty} />}
+      {section === "server-updates" && <ServerUpdatesAdmin key={revision} request={request} onDirty={setDirty}/>}
+      {section === "server-bridge" && <ServerBridgeAdmin key={revision} request={request}/>}
     </section>
   </div>;
 }

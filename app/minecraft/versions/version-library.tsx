@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import InfiniteListEnd from "@/components/infinite-list-end";
+import { BookmarkButton } from "../../bookmarks-provider";
 import Link from "@/components/site-link";
 import { ArrowRight, Search } from "@/components/site-icons";
 import { channelLabels, channelDescriptions, minecraftDate, versionChannel, type MinecraftVersion, type VersionChannel } from "@/lib/minecraft-catalog";
@@ -19,9 +20,9 @@ export default function VersionLibrary({ versions, latest }: { versions: Minecra
     <div className="mc-channel-explanation" aria-live="polite"><h3>{channelLabels[channel]}{channel === "release" && <span>Release</span>}{channel === "snapshot" && <span>Snapshot</span>}</h3><p>{channelDescriptions[channel]}</p></div>
     <details className="mc-channel-guide"><summary>버전 분류 전체 설명</summary><dl>{(Object.keys(channelLabels) as VersionChannel[]).filter(key => key !== "all").map(key => <div key={key}><dt>{channelLabels[key]}</dt><dd>{channelDescriptions[key]}</dd></div>)}</dl><p>초기 개발 시기의 모든 빌드가 보존된 것은 아닙니다. 공식 배포 목록에 있는 버전만 표시합니다.</p></details>
     <div className="mc-results-heading"><p role="status">총 <strong>{filtered.length.toLocaleString("ko-KR")}</strong>개 버전</p><span>최신 공개순 · Java Edition</span></div>
-    <div className="mc-version-list">{filtered.slice(0, limit).map(version => { const type = versionChannel(version); return <Link className="mc-version-row" href={`/minecraft/versions/${encodeURIComponent(version.id)}`} key={version.id}>
+    <div className="mc-version-list">{filtered.slice(0, limit).map(version => { const type = versionChannel(version); return <div className="mc-version-saved-row" key={version.id}><Link className="mc-version-row" href={`/minecraft/versions/${encodeURIComponent(version.id)}`}>
       <div className="mc-version-name">{version.image && <img className="mc-version-thumb" src={version.image.url} alt="" width={64} height={64} loading="lazy" decoding="async"/>}<div><strong>{version.id}</strong>{version.updateName && <span className="mc-version-update-name">{version.updateName}</span>}{version.id === latest?.release && <span className="mc-latest-label">최신 정식</span>}{version.id === latest?.snapshot && version.id !== latest?.release && <span className="mc-latest-label">최신 테스트</span>}</div></div><span className={`mc-badge mc-badge-${type}`}>{channelLabels[type]}</span><time dateTime={version.releaseTime}>{minecraftDate(version.releaseTime)}</time><ArrowRight size={18}/>
-    </Link>; })}</div>
+    </Link><BookmarkButton kind="version" resourceId={version.id} title={[version.id, version.updateName].filter(Boolean).join(" ")} href={`/minecraft/versions/${encodeURIComponent(version.id)}`} compact/></div>; })}</div>
     {!filtered.length && <div className="mc-empty"><h3>일치하는 버전이 없습니다.</h3><p>검색어나 필터를 바꿔 다시 찾아보세요.</p><button className="text-link" type="button" onClick={() => { setQuery(""); setChannel("all"); setYear(""); setLimit(40); }}>검색 초기화 <ArrowRight size={16}/></button></div>}
     <InfiniteListEnd shown={limit} total={filtered.length} onLoadMore={() => setLimit(value => Math.min(value + 40, filtered.length))}/>
   </section>;
