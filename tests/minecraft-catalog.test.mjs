@@ -36,6 +36,14 @@ test('news and version outages are independent, including malformed provider dat
   assert.equal(catalog.latest, null); assert.deepEqual(catalog.news, []);
 });
 
+test('the update archive retains older official entries for continuous scrolling', async () => {
+  const archive = { entries: Array.from({ length: 65 }, (_, index) => ({ ...news.entries[0], id: `entry-${index}`, version: `test-${index}`, date: new Date(Date.UTC(2026, 0, index + 1)).toISOString() })) };
+  const catalog = await loadMinecraftCatalog(async url => Response.json(url === MANIFEST_URL ? manifest() : archive));
+  assert.equal(catalog.news.length, 65);
+  assert.equal(catalog.news[0].id, 'entry-64');
+  assert.equal(catalog.news.at(-1).id, 'entry-0');
+});
+
 test('unknown version does not construct or fetch an arbitrary URL', async () => {
   let calls = 0;
   assert.equal(await loadMinecraftVersion('https://example.invalid/', async () => { calls++; return Response.json(manifest()); }), null);

@@ -82,7 +82,6 @@ export default function SiteHeader() {
           <DropdownMenuContent className="mobile-nav-popup" aria-label="주 메뉴" aria-labelledby={undefined} align="end" sideOffset={15} collisionPadding={20} onCloseAutoFocus={event => event.preventDefault()} onEscapeKeyDown={() => mobileMenuTrigger.current?.focus()}>
             <DropdownMenuLabel className="mobile-nav-label">둘러보기</DropdownMenuLabel>
             {links.map(link => <DropdownMenuItem asChild key={link.href}><Link className="mobile-nav-link" href={link.href} onClick={() => setMobileMenuOpen(false)} aria-current={pathname.startsWith(link.href) ? "page" : undefined}>{link.label}<ArrowRight size={18}/></Link></DropdownMenuItem>)}
-            <DropdownMenuSeparator/><DropdownMenuItem asChild><Link className="mobile-nav-link" href="/minecraft/versions" onClick={() => setMobileMenuOpen(false)}>버전 라이브러리<ArrowRight size={18}/></Link></DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

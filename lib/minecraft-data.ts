@@ -111,7 +111,7 @@ export async function loadMinecraftCatalog(fetcher: typeof fetch = fetch): Promi
   return {
     latest: manifest.status === "fulfilled" ? manifest.value.latest : null,
     versions: manifest.status === "fulfilled" ? manifest.value.versions.map(({ id, type, releaseTime }) => ({ id, type, releaseTime, updateName: minecraftUpdateName(id), image: artwork.get(id) ?? null })) : [],
-    news: news.status === "fulfilled" ? news.value.slice(0, 48) : [],
+    news: news.status === "fulfilled" ? news.value : [],
     versionsAvailable: manifest.status === "fulfilled", newsAvailable: news.status === "fulfilled",
   };
 }

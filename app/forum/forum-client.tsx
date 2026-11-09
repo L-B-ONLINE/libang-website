@@ -21,8 +21,6 @@ export default function ForumClient({ posts, signedIn, isAdmin, signInPath, init
   const [query, setQuery] = useState(initialQuery);
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const [tabIndicator, setTabIndicator] = useState<{ left: number; width: number } | null>(null);
   const [open, setOpen] = useState(false);
   const [penTilt, setPenTilt] = useState(false);
   const penTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -66,23 +64,6 @@ export default function ForumClient({ posts, signedIn, isAdmin, signInPath, init
     return () => clearTimeout(timer);
   }, [query, filter]);
 
-  useEffect(() => {
-    const tabs = tabsRef.current;
-    if (!tabs) return;
-    let frame = 0;
-    const measure = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const selected = tabs.querySelector<HTMLButtonElement>('button[aria-pressed="true"]');
-        if (selected) setTabIndicator({ left: selected.offsetLeft, width: selected.offsetWidth });
-      });
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(tabs);
-    window.addEventListener("resize", measure);
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener("resize", measure); };
-  }, [filter]);
   useEffect(() => () => penTimers.current.forEach(clearTimeout), []);
 
   function openComposer() {
@@ -107,9 +88,8 @@ export default function ForumClient({ posts, signedIn, isAdmin, signInPath, init
 
   return <>
     <div className="forum-title-actions">{effectiveSignedIn ? <button type="button" className="btn btn-primary" onClick={openComposer}><Pencil size={18}/>글쓰기</button> : <Link className="btn btn-primary" href={signInPath}><Pencil size={18}/>글쓰기</Link>}</div>
-    <div className="topic-tabs" role="group" aria-label="포럼 주제" ref={tabsRef}>
-      {(["all", "notice", "free", "question", "development", "gaming", "daily"] as const).map((item) => <button aria-pressed={filter === item} className={filter === item ? "active" : ""} key={item} onClick={() => { setFilter(item); setPage(1); }} type="button">{item === "all" ? "전체" : labels[item]}</button>)}
-      {tabIndicator && <span aria-hidden="true" className="topic-indicator" style={{ width: tabIndicator.width, transform: `translateX(${tabIndicator.left}px)` }} />}
+    <div className="topic-tabs choice-scroll" role="group" aria-label="포럼 주제">
+      {(["all", "notice", "free", "question", "development", "gaming", "daily"] as const).map((item) => <button aria-pressed={filter === item} key={item} onClick={() => { setFilter(item); setPage(1); }} type="button">{item === "all" ? "전체" : labels[item]}</button>)}
     </div>
     <div className="forum-toolbar"><label className="forum-search"><Search size={17} /><span className="sr-only">제목, 내용, 작성자 검색</span><input type="search" value={query} onChange={event => { setQuery(event.target.value); setPage(1); }} placeholder="제목, 내용, 작성자 검색" />{query && <button type="button" aria-label="검색어 지우기" onClick={() => { setQuery(""); setPage(1); }}><X size={16} /></button>}</label><div className="forum-sort"><span role="status">{visible.length}개의 글</span><button className="forum-sort-icon" type="button" aria-label={sort === "newest" ? "최신순, 오래된순으로 변경" : "오래된순, 최신순으로 변경"} title={sort === "newest" ? "최신순" : "오래된순"} onClick={()=>{setSort(sort === "newest" ? "oldest" : "newest");setPage(1);}}>{sort === "newest" ? <ArrowDownWideNarrow size={18}/> : <ArrowUpNarrowWide size={18}/>}</button></div></div>
     <section className="post-list">
