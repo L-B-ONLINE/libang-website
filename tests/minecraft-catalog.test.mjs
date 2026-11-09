@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { loadMinecraftCatalog, loadMinecraftVersion, officialArticleUrl, isOfficialMetadataUrl, fetchMinecraftJson, MANIFEST_URL, NEWS_URL } from '../lib/minecraft-data.ts';
+import { loadMinecraftCatalog, loadMinecraftVersion, officialArticleUrl, isOfficialMetadataUrl, officialMinecraftImage, minecraftUpdateName, fetchMinecraftJson, MANIFEST_URL, NEWS_URL } from '../lib/minecraft-data.ts';
 import { versionChannel } from '../lib/minecraft-catalog.ts';
 
 const hash = 'a'.repeat(40);
@@ -8,7 +8,7 @@ const manifest = () => ({ latest: { release: '26.3', snapshot: '26.4-snapshot-7'
   { id: '26.3', type: 'release', releaseTime: '2026-09-01T12:00:00Z', url: `https://piston-meta.mojang.com/v1/packages/${hash}/26.3.json` },
   { id: '26.4-snapshot-7', type: 'snapshot', releaseTime: '2026-11-03T13:08:56Z', url: `https://piston-meta.mojang.com/v1/packages/${hash}/26.4-snapshot-7.json` },
 ] });
-const news = { entries: [{ id: '26-3', version: '26.3', title: 'Minecraft: Java Edition 26.3', type: 'release', date: '2026-09-01T12:00:00Z', shortText: 'Official short introduction.' }] };
+const news = { entries: [{ id: '26-3', version: '26.3', title: 'Minecraft: Java Edition 26.3', type: 'release', date: '2026-09-01T12:00:00Z', shortText: 'Official short introduction.', image: { url: '/v2/images/26-3.jpg', title: 'Official artwork' } }] };
 
 test('catalog sorts official versions and keeps internal metadata URLs server-side', async () => {
   const calls = [];
@@ -21,6 +21,8 @@ test('catalog sorts official versions and keeps internal metadata URLs server-si
   assert.equal(catalog.versions[0].id, '26.4-snapshot-7');
   assert.equal(catalog.versions[0].url, undefined);
   assert.equal(catalog.news[0].url, 'https://www.minecraft.net/en-us/article/minecraft-java-edition-26-3');
+  assert.equal(catalog.news[0].updateName, 'Wilderness Bound');
+  assert.equal(catalog.versions.find(version => version.id === '26.3').image.url, 'https://launchercontent.mojang.com/v2/images/26-3.jpg');
   assert.equal(catalog.versionsAvailable, true); assert.equal(catalog.newsAvailable, true);
 });
 
@@ -75,7 +77,26 @@ test('version channels distinguish prereleases, candidates and historical editio
   for (const id of ['1.21-pre1', '1.21-rc1', '26.3-pre-3', '26.3-rc-3']) assert.equal(versionChannel({ id, type: 'snapshot' }), 'preview');
   assert.equal(versionChannel({ id: '26.4-snapshot-7', type: 'snapshot' }), 'snapshot');
   assert.equal(versionChannel({ id: '24w03b', type: 'snapshot' }), 'snapshot');
-  assert.equal(versionChannel({ id: 'b1.7.3', type: 'old_beta' }), 'classic');
+  assert.equal(versionChannel({ id: 'b1.7.3', type: 'old_beta' }), 'beta');
+  assert.equal(versionChannel({ id: 'a1.2.6', type: 'old_alpha' }), 'alpha');
+  assert.equal(versionChannel({ id: 'c0.30_01c', type: 'old_alpha' }), 'classic');
+  assert.equal(versionChannel({ id: 'inf-20100618', type: 'old_alpha' }), 'infdev');
+  assert.equal(versionChannel({ id: 'rd-132211', type: 'old_alpha' }), 'preclassic');
+});
+
+test('game-drop names preserve known releases and do not invent names for future versions', () => {
+  for (const id of ['26.3', '26.3-pre-1', '26.3-rc-3']) assert.equal(minecraftUpdateName(id), 'Wilderness Bound');
+  assert.equal(minecraftUpdateName('26.1.2'), 'Tiny Takeover');
+  assert.equal(minecraftUpdateName('1.21.10'), 'The Copper Age');
+  assert.equal(minecraftUpdateName('1.21.5'), 'Spring to Life');
+  assert.equal(minecraftUpdateName('1.20.6'), 'Armored Paws');
+  assert.equal(minecraftUpdateName('26.4-snapshot-7'), null);
+  assert.equal(minecraftUpdateName('c0.30_01c'), null);
+});
+
+test('official artwork accepts publisher image paths and rejects external or script URLs', () => {
+  assert.equal(officialMinecraftImage('/v2/images/26-3.jpg', 'Official').url, 'https://launchercontent.mojang.com/v2/images/26-3.jpg');
+  for (const url of ['https://evil.example/v2/images/test.jpg', '//evil.example/test.jpg', 'javascript:alert(1)', '/v2/images/test.svg', 'https://launchercontent.mojang.com/v2/images/test.jpg?redirect=evil']) assert.equal(officialMinecraftImage(url, 'Official'), null);
 });
 
 test('official article links support old and new version naming', () => {

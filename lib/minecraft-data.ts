@@ -17,6 +17,7 @@ const manifestSchema = z.object({
 const newsSchema = z.object({ entries: z.array(z.object({
   id: z.string(), version: z.string(), title: z.string(), shortText: z.string().default(""),
   date: validDate, type: z.enum(["release", "snapshot"]),
+  image: z.object({ url: z.string(), title: z.string().optional() }).optional(),
 })).max(10000) });
 
 // Fixed public sources only. Bound both network time and decoded response size.
@@ -66,24 +67,51 @@ async function loadManifest(fetcher: typeof fetch) {
   return manifest;
 }
 
+// Confirmed game-drop names; unknown future drops keep their official version title.
+export function minecraftUpdateName(id: string): string | null {
+  const version = /^(\d+)\.(\d+)(?:\.(\d+))?(?:$|[-_])/.exec(id);
+  if (!version) return null;
+  const [, major, minor, patch = "0"] = version;
+  if (major === "26") return ({ "1": "Tiny Takeover", "2": "Chaos Cubed", "3": "Wilderness Bound" } as Record<string, string>)[minor] ?? null;
+  if (major !== "1") return null;
+  if (minor === "20" && Number(patch) >= 5) return "Armored Paws";
+  if (minor === "21") {
+    const number = Number(patch);
+    return number >= 11 ? "Mounts of Mayhem" : number >= 9 ? "The Copper Age" : number >= 6 ? "Chase the Skies" : number >= 5 ? "Spring to Life" : number >= 4 ? "The Garden Awakens" : number >= 2 ? "Bundles of Bravery" : "Tricky Trials";
+  }
+  return ({ "20": "Trails & Tales", "19": "The Wild Update", "18": "Caves & Cliffs: Part II", "17": "Caves & Cliffs: Part I", "16": "Nether Update", "15": "Buzzy Bees", "14": "Village & Pillage", "13": "Update Aquatic" } as Record<string, string>)[minor] ?? null;
+}
+
+export function officialMinecraftImage(path: string | undefined, alt: string) {
+  if (!path) return null;
+  try {
+    const url = new URL(path, "https://launchercontent.mojang.com");
+    if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash || url.host !== "launchercontent.mojang.com" || !/^\/(?:v2\/)?images\/[^/]+\.(?:jpe?g|png|webp)$/i.test(url.pathname)) return null;
+    return { url: url.href, alt };
+  } catch { return null; }
+}
+
 async function loadNews(fetcher: typeof fetch): Promise<MinecraftNews[]> {
   const { entries } = newsSchema.parse(await fetchMinecraftJson(NEWS_URL, fetcher));
-  return entries.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)).slice(0, 48).map(entry => ({
+  return entries.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)).map(entry => ({
     id: entry.id, version: entry.version, title: entry.title,
     summary: entry.shortText.slice(0, 500), date: entry.date, type: entry.type,
     url: officialArticleUrl(entry.version, entry.type),
+    updateName: minecraftUpdateName(entry.version),
+    image: officialMinecraftImage(entry.image?.url, `${entry.title} 공식 이미지`),
   }));
 }
 
 export async function loadMinecraftCatalog(fetcher: typeof fetch = fetch): Promise<MinecraftCatalog> {
   const [manifest, news] = await Promise.allSettled([loadManifest(fetcher), loadNews(fetcher)]);
+  const artwork = new Map(news.status === "fulfilled" ? news.value.map(entry => [entry.version, entry.image]) : []);
   for (const [source, result] of [["manifest", manifest], ["news", news]] as const) {
     if (result.status === "rejected") console.warn(JSON.stringify({ event: "minecraft_catalog_unavailable", source, reason: result.reason instanceof Error ? result.reason.message.slice(0, 160) : "Unknown error" }));
   }
   return {
     latest: manifest.status === "fulfilled" ? manifest.value.latest : null,
-    versions: manifest.status === "fulfilled" ? manifest.value.versions.map(({ id, type, releaseTime }) => ({ id, type, releaseTime })) : [],
-    news: news.status === "fulfilled" ? news.value : [],
+    versions: manifest.status === "fulfilled" ? manifest.value.versions.map(({ id, type, releaseTime }) => ({ id, type, releaseTime, updateName: minecraftUpdateName(id), image: artwork.get(id) ?? null })) : [],
+    news: news.status === "fulfilled" ? news.value.slice(0, 48) : [],
     versionsAvailable: manifest.status === "fulfilled", newsAvailable: news.status === "fulfilled",
   };
 }
@@ -115,8 +143,10 @@ export async function loadMinecraftVersion(id: string, fetcher: typeof fetch = f
     const url = new URL(server.url);
     if (url.protocol === "https:" && ["piston-data.mojang.com", "launcher.mojang.com"].includes(url.host) && !url.username && !url.password && !url.search && !url.hash && url.pathname === `/v1/objects/${server.sha1}/server.jar`) download = server;
   }
+  let artwork: MinecraftNews | undefined;
+  try { artwork = (await loadNews(fetcher)).find(entry => entry.version === id); } catch { /* Version metadata remains available without artwork. */ }
   return {
-    version: { id: version.id, type: version.type, releaseTime: version.releaseTime } satisfies MinecraftVersion,
+    version: { id: version.id, type: version.type, releaseTime: version.releaseTime, updateName: minecraftUpdateName(id), image: artwork?.image ?? null } satisfies MinecraftVersion,
     latestRelease: manifest.latest.release, latestSnapshot: manifest.latest.snapshot,
     javaVersion: metadata.javaVersion?.majorVersion ?? null,
     download: download ?? null, source: version.url,

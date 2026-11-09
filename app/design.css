@@ -45,13 +45,24 @@ body{font-size:15px;line-height:1.75}svg{stroke-linecap:round;stroke-linejoin:ro
 .forum-sort .forum-sort-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:0}.forum-sort-icon:hover{color:var(--text);border-color:var(--strong-line)}.forum-sort-icon:focus-visible{outline:2px solid var(--accent);outline-offset:3px}@media(max-width:600px){.forum-sort{width:auto;flex:0 0 auto}.topic-tabs{justify-content:flex-start}.topic-tabs button{flex:0 0 auto;padding:12px 14px}}
 
 /* Minecraft entry points and the expanded navigation. */
-.footer-directory{grid-template-columns:repeat(4,minmax(0,1fr))}
 .lb-minecraft-band{display:flex;justify-content:space-between;align-items:center;gap:35px;border-top:1px solid var(--line);padding-block:32px 38px}
 .lb-minecraft-band>div>span{font-size:10px;letter-spacing:1.5px;color:var(--accent);font-weight:650}
 .lb-minecraft-band h2{font-size:27px;letter-spacing:-.8px;font-weight:650;margin:8px 0}
 .lb-minecraft-band p{color:var(--muted);font-size:13px}
 .lb-minecraft-band>div:last-child{display:grid;gap:8px;flex-shrink:0}
-@media(min-width:601px) and (max-width:1000px){.header-line{gap:18px}.main-nav{gap:18px}.header-connect{display:none}.brand-word{font-size:17px}}
-@media(max-width:600px){.header-line{display:grid;grid-template-columns:minmax(0,1fr) auto;height:auto;gap:0 15px}.brand{grid-column:1;grid-row:1;min-height:61px}.header-utilities{grid-column:2;grid-row:1}.main-nav{grid-column:1/-1;grid-row:2;justify-content:space-between;gap:15px;border-top:1px solid var(--line);min-height:42px;padding-bottom:1px}.main-nav a{font-size:12px;white-space:nowrap}.footer-directory{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.lb-minecraft-band{display:block;padding-block:25px 30px}.lb-minecraft-band h2{font-size:24px}.lb-minecraft-band p{font-size:12px;word-break:keep-all}.lb-minecraft-band>div:last-child{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px}}
-.lb-featured{align-items:center}
-@media(max-width:600px){.header-line>.main-nav{width:100%;margin-left:0}.lb-featured{min-height:220px}}
+@media(max-width:600px){.lb-minecraft-band{display:block;padding-block:25px 30px}.lb-minecraft-band h2{font-size:24px}.lb-minecraft-band p{font-size:12px;word-break:keep-all}.lb-minecraft-band>div:last-child{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:16px}}
+
+/* Compact mobile navigation; the rest of the header keeps its original layout. */
+.mobile-menu-toggle{display:none}
+.mobile-nav-popup{width:min(300px,calc(100vw - 40px));max-height:calc(100dvh - 100px);overflow-y:auto;padding:8px;border:1px solid var(--strong-line);background:var(--surface);color:var(--text);box-shadow:4px 4px 0 #0003;border-radius:8px;z-index:70}
+.mobile-nav-label{font-size:11px;color:var(--muted);padding:10px 14px}
+.mobile-nav-popup .mobile-nav-link{display:flex;justify-content:space-between;align-items:center;gap:20px;min-height:48px;font-size:14px;padding:12px 14px;border-radius:4px;cursor:pointer}
+.mobile-nav-link[aria-current=page]{color:var(--accent);background:var(--accent-soft)}
+.mobile-nav-popup .mobile-nav-link[data-highlighted]{background:var(--subtle);color:var(--text)}
+.mobile-nav-popup[data-state=open]{animation:mobile-nav-enter .18s ease-out}
+.mobile-nav-popup[data-state=closed]{animation:mobile-nav-leave .14s ease-in}
+@keyframes mobile-nav-enter{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes mobile-nav-leave{to{opacity:0;transform:translateY(-5px) scale(.98)}}
+@media(max-width:760px){.header-line{display:flex;height:67px;gap:12px}.header-line>.brand{margin-right:auto;min-width:0}.header-line>.main-nav,.header-connect{display:none}.header-line>.header-utilities{display:flex;gap:8px;margin:0}.mobile-menu-toggle{position:relative;display:block;width:40px;height:40px;flex-shrink:0;background:transparent;color:var(--text);cursor:pointer;border:0}.mobile-menu-toggle>span{position:absolute;left:10px;top:15px;width:20px;height:2px;background:currentColor;transform-origin:center;transition:transform .25s cubic-bezier(.4,0,.2,1)}.mobile-menu-toggle>span+span{top:23px}.mobile-menu-toggle[data-state=open]>span:first-child{transform:translateY(4px) rotate(45deg)}.mobile-menu-toggle[data-state=open]>span:last-child{transform:translateY(-4px) rotate(-45deg)}.mobile-menu-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}}
+@media(min-width:761px){.mobile-nav-popup{display:none}}
+@media(prefers-reduced-motion:reduce){.mobile-menu-toggle>span{transition:none}.mobile-nav-popup[data-state]{animation:none}}

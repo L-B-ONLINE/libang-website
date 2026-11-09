@@ -4,7 +4,7 @@ import Link from "@/components/site-link";
 import { ArrowLeft, ArrowUpRight } from "@/components/site-icons";
 import PageFrame from "../../../page-frame";
 import { loadMinecraftVersion } from "@/lib/minecraft-data";
-import { channelLabels, minecraftDate, versionChannel } from "@/lib/minecraft-catalog";
+import { channelLabels, channelDescriptions, minecraftDate, versionChannel } from "@/lib/minecraft-catalog";
 import CatalogStatus from "../../catalog-status";
 
 export const dynamic = "force-dynamic";
@@ -20,9 +20,10 @@ export default async function VersionPage({ params }: { params: Promise<{ id: st
   if (!data) notFound();
   const { version, download } = data;
   const channel = versionChannel(version);
-  return <PageFrame title={version.id} className="minecraft-page" actions={<Link className="text-link" href="/minecraft/versions"><ArrowLeft size={17}/>버전 목록</Link>}>
+  return <PageFrame title={[version.id, version.updateName].filter(Boolean).join(" ")} className="minecraft-page" actions={<Link className="text-link" href="/minecraft/versions"><ArrowLeft size={17}/>버전 목록</Link>}>
+    {version.image && <img className="mc-version-hero" src={version.image.url} alt={version.image.alt} width={960} height={540} fetchPriority="high" decoding="async"/>}
     <header className="mc-version-intro"><span className="mc-eyebrow">MINECRAFT / JAVA EDITION</span><div><span className={`mc-badge mc-badge-${channel}`}>{channelLabels[channel]}</span>{id === data.latestRelease && <span className="mc-latest-label">최신 정식 버전</span>}</div><p>Java Edition 공식 배포 정보</p></header>
-    {channel !== "release" && <p className="mc-preview-notice">{channel === "classic" ? "오래된 버전은 현재 환경에서 정상 실행되지 않을 수 있습니다." : "개발 중인 테스트 버전입니다. 기존 월드를 백업하고 별도의 환경에서 실행하세요."}</p>}
+    <div className="mc-channel-explanation"><h2>{channelLabels[channel]}</h2><p>{channelDescriptions[channel]}</p></div>
     <div className="mc-detail-grid"><section className="mc-version-facts" aria-labelledby="mc-version-facts"><h2 id="mc-version-facts">버전 정보</h2><dl><div><dt>버전</dt><dd>{version.id}</dd></div><div><dt>에디션</dt><dd>Java Edition</dd></div><div><dt>공개일</dt><dd><time dateTime={version.releaseTime}>{minecraftDate(version.releaseTime)}</time></dd></div><div><dt>분류</dt><dd>{channelLabels[channel]}</dd></div><div><dt>Java 요구 버전</dt><dd>{data.javaVersion ? `Java ${data.javaVersion}` : "공식 배포 정보에 미표기"}</dd></div></dl><a className="text-link" href={data.source} target="_blank" rel="noopener noreferrer">Mojang 공식 배포 정보 <ArrowUpRight size={16}/></a></section>
       <aside className="mc-download-panel"><h2>공식 서버 파일</h2>{download ? <><p>Mojang이 배포한 이 버전의 바닐라 서버 파일입니다.</p><a className="btn btn-primary" href={download.url}>server.jar 다운로드 <ArrowUpRight size={18}/></a><span className="mc-file-size">{(download.size / 1024 / 1024).toFixed(1)} MB</span><details className="mc-checksum"><summary>파일 검증용 SHA-1</summary><code>{download.sha1}</code></details><p className="mc-source-note">실행 전 <a href="https://www.minecraft.net/en-us/eula" target="_blank" rel="noopener noreferrer">Minecraft EULA</a>를 확인하세요.</p></> : <p>이 버전은 공식 배포 목록에 서버 파일이 제공되지 않습니다. 게임은 Minecraft 런처에서 설치해 주세요.</p>}</aside>
     </div>
