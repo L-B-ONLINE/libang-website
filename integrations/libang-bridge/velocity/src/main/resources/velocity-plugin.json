@@ -1,0 +1,1 @@
+{"id":"libangbridge","name":"Libang Bridge","version":"1.0.0","description":"Aggregate live status bridge for the Libang website.","url":"https://web.libang.online","authors":["L.B ONLINE"],"dependencies":[],"main":"online.libang.bridge.LibangVelocity"}

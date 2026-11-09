@@ -1,0 +1,4 @@
+d8f0eab2569a797a791acfea7faf228a501be6bb61b9e4576532fa01d59f57d6  libang-bridge-README.ko.md
+9abce71c2233fde6352a9902a77e65289f605b02695c62a19418889bcb1cd270  libang-bridge-paper-1.0.0.jar
+07c9f7d5af4bef71dc71c5dd23084dc04c1b96a9207522794e812ddd42db8256  libang-bridge-source-1.0.0.zip
+6217a333e25d513264588e451f0bbfa53c05f4cf0eca85dbc913f0d7d0edba7d  libang-bridge-velocity-1.0.0.jar

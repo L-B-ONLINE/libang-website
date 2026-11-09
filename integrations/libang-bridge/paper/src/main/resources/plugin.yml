@@ -1,0 +1,15 @@
+name: LibangBridge
+version: 1.0.0
+main: online.libang.bridge.LibangPaper
+api-version: '26.3'
+author: L.B ONLINE
+website: https://web.libang.online
+description: Aggregate live status bridge for the Libang website.
+commands:
+  libangbridge:
+    description: Pair this server with the Libang website.
+    permission: libangbridge.admin
+permissions:
+  libangbridge.admin:
+    description: Manage the private site connection.
+    default: op

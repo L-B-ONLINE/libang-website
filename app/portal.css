@@ -62,3 +62,5 @@
 }
 @keyframes roadmap-line-vertical{from{scale:1 0;opacity:0}to{scale:1;opacity:1}}@keyframes roadmap-travel-vertical{0%{top:0;opacity:0}20%{opacity:1}80%{opacity:1}100%{top:100%;opacity:0}}
 @media(prefers-reduced-motion:reduce){.spotlight-panel[data-state],.spotlight-overlay[data-state],.portal-toast,.bookmark-button[aria-busy=true] svg,.roadmap-intro *,[data-ready=true] .roadmap-connector,[data-ready=true] .roadmap-connector>i,.roadmap-node{animation:none!important}.roadmap-stage-card{transition:none;will-change:auto}[data-ready=true] .roadmap-stage .roadmap-stage-card{opacity:1!important;transform:none!important;filter:none!important}.roadmap-intro h1>span{clip-path:none}}
+
+.bridge-install-steps{margin:22px 0 4px;padding-left:20px;display:grid;gap:10px;color:var(--muted);font-size:12px;line-height:1.9}.bridge-downloads .btn{max-width:100%;white-space:normal}
