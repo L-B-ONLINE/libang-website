@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { searchEntries } from '../lib/search-model.ts';
+import { searchEntries, searchExcerpt, searchTokens } from '../lib/search-model.ts';
 import { safeReturnPath } from '../lib/portal-types.ts';
 import { bridgeState, readPortalJson, hashSecret, equalDigests, randomSecret, heartbeatSchema } from '../lib/portal-model.ts';
 
@@ -48,4 +48,20 @@ test('heartbeat rejects invented capacity and unbounded inputs', () => {
   const sample={state:'online',playersOnline:4,playersMax:100,gameVersion:'26.3',supportedVersions:['26.3'],software:'Leaf'};
   assert.equal(heartbeatSchema.safeParse(sample).success,true);
   for(const overrides of [{playersOnline:-1},{playersOnline:101},{playersMax:0},{gameVersion:''},{software:'x'.repeat(81)},{supportedVersions:Array(21).fill('26.3')}]) assert.equal(heartbeatSchema.safeParse({...sample,...overrides}).success,false);
+});
+
+
+test('search scopes isolate kinds while preserving title ranking and empty scoped browsing', () => {
+  const entries=[{id:'a',kind:'post',title:'평화 야생',description:'동원'},{id:'b',kind:'server',title:'동원',description:'평화 야생'},{id:'c',kind:'post',title:'동원',description:'평화 야생'}];
+  assert.deepEqual(searchEntries(entries,'동원',24,'post').map(e=>e.id),['c','a']);
+  assert.deepEqual(searchEntries(entries,'',24,'post').map(e=>e.id),['a','c']);
+  assert.deepEqual(searchEntries(entries,'평화',24,'server').map(e=>e.id),['b']);
+  assert.deepEqual(searchEntries(entries,'동원',24,'guide'),[]);
+});
+test('forum excerpts reveal body matches far beyond the old truncated preview', () => {
+  const text='도입부 '.repeat(800)+'나침반은 보관함에 있습니다. '+'끝부분 '.repeat(100);
+  const excerpt=searchExcerpt(text,'나침반');
+  assert.ok(excerpt.startsWith('…')); assert.ok(excerpt.includes('나침반은 보관함')); assert.ok(excerpt.length<=182);
+  assert.deepEqual(searchTokens('  PAPER   나침반  '),['paper','나침반']);
+  assert.deepEqual(searchTokens('100% _ \\'),['100%','_','\\']);
 });
