@@ -9,7 +9,7 @@ import { useAuth } from "./auth-provider";
 import { SkinFace, PlayerName, usePlayerIdentity, usePlayerIdentityLoading } from "./player-identity";
 import { UserRound as AccountIcon } from "@/components/site-icons";
 
-const links = [{ href: "/servers", label: "서버" }, { href: "/forum", label: "포럼" }, { href: "/guide", label: "가이드" }];
+const links = [{ href: "/servers", label: "서버" }, { href: "/forum", label: "포럼" }, { href: "/guide", label: "가이드" }, { href: "/minecraft", label: "마인크래프트" }];
 type Theme = "system" | "light" | "dark";
 export default function SiteHeader() {
   const pathname = usePathname();
