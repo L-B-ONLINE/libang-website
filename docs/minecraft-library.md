@@ -33,3 +33,5 @@ Local managed environments need the inherited HTTPS proxy for outbound connectio
 - Dark theme references [Leaf-website global.css](https://github.com/Winds-Studio/Leaf-website/blob/main/src/app/%5Blang%5D/global.css): neutral dark backgrounds, off-white text, subdued borders and green accents. Separate filled-action and text-accent variables maintain readable button contrast. Light remains the default; explicit and automatic light modes retain the original palette.
 - Both news and versions use the shared `InfiniteListEnd` component. IntersectionObserver reveals the next batch near the bottom, with scroll/resize fallback and keyboard-focus support. Filtering resets the batch size, and the final batch displays an end marker. No More buttons or extra data services are needed.
 - Removed the old 48-news-entry truncation; the complete official feed is available. Metadata stays in the existing source cache and images remain lazy-loaded.
+
+- Follow-up preference: use the same brand accent `#147953` for light, dark and automatic themes. Dark surfaces remain neutral; filled actions use the same green with light foreground text.
