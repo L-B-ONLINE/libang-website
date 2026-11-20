@@ -1,7 +1,7 @@
-export type SearchKind = "server" | "guide" | "post" | "version" | "update";
+export type SearchKind = "server" | "guide" | "post" | "update";
 export type SearchEntry = { id: string; kind: SearchKind; title: string; description: string; href: string; keywords?: string };
-export const searchLabels: Record<SearchKind, string> = { server: "서버", guide: "가이드", post: "포럼", version: "마인크래프트 버전", update: "리뱅 소식" };
-export const searchScopes: { kind: SearchKind; label: string }[] = [{ kind: "post", label: "포럼" }, { kind: "guide", label: "가이드" }, { kind: "server", label: "서버" }, { kind: "version", label: "마인크래프트" }, { kind: "update", label: "서버 소식" }];
+export const searchLabels: Record<SearchKind, string> = { server: "서버", guide: "가이드", post: "포럼", update: "리뱅 소식" };
+export const searchScopes: { kind: SearchKind; label: string }[] = [{ kind: "post", label: "포럼" }, { kind: "guide", label: "가이드" }, { kind: "server", label: "서버" }, { kind: "update", label: "서버 소식" }];
 export function searchTokens(query: string) { return query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean).slice(0, 8); }
 export function searchExcerpt(content: string, query: string, length = 180) {
   const text = content.replace(/\s+/g, " ");

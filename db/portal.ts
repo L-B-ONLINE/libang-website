@@ -1,15 +1,14 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { getD1, getDb } from ".";
 import { bookmarks, serverCredentials, serverHeartbeats, serverPairCodes, serverUpdates } from "./schema";
 import { getPost } from "./forum";
 import { guideKeys } from "./guide";
-import { loadMinecraftCatalog } from "../lib/minecraft-data";
 import { PortalError, hashSecret, randomSecret, equalDigests, type BookmarkKind } from "../lib/portal-model";
 
 const guideNames: Record<string, string> = { connect: "서버 접속 방법", commands: "기본 명령어", dongwon: "Dongwon 시작하기", lokawar: "Bose 시작하기", reability: "ReAbility 시작하기", rules: "이용 규칙", faq: "자주 묻는 질문" };
 
 export async function listSaved(userId: string) {
-  const rows = await getDb().select({ kind: bookmarks.kind, resourceId: bookmarks.resourceId, title: bookmarks.title, href: bookmarks.href, createdAt: bookmarks.createdAt }).from(bookmarks).where(eq(bookmarks.userId, userId)).orderBy(desc(bookmarks.createdAt)).limit(500);
+  const rows = await getDb().select({ kind: bookmarks.kind, resourceId: bookmarks.resourceId, title: bookmarks.title, href: bookmarks.href, createdAt: bookmarks.createdAt }).from(bookmarks).where(and(eq(bookmarks.userId, userId), ne(bookmarks.kind, "version"))).orderBy(desc(bookmarks.createdAt)).limit(500);
   return rows.map(row => ({ ...row, createdAt: row.createdAt.toISOString() }));
 }
 
@@ -25,19 +24,14 @@ export async function canonicalBookmark(kind: BookmarkKind, resourceId: string) 
     if (!guideKeys.some(value => value === key)) throw new PortalError(404, "가이드가 없습니다.");
     return { kind, resourceId: key, title: guideNames[key], href: `/guide#${key === "lokawar" ? "bose" : key}` };
   }
-  if (!/^[a-zA-Z0-9._-]{1,100}$/.test(resourceId)) throw new PortalError(400, "버전을 확인하세요.");
-  const catalog = await loadMinecraftCatalog();
-  if (!catalog.versionsAvailable) throw new PortalError(503, "공식 버전 목록을 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.");
-  const version = catalog.versions.find(version => version.id === resourceId);
-  if (!version) throw new PortalError(404, "버전이 없습니다.");
-  return { kind, resourceId, title: [version.id, version.updateName].filter(Boolean).join(" "), href: `/minecraft/versions/${encodeURIComponent(version.id)}` };
+  throw new PortalError(410, "마인크래프트 버전 라이브러리는 종료되었습니다.");
 }
 
 export async function saveBookmark(userId: string, kind: BookmarkKind, resourceId: string) {
   const entry = await canonicalBookmark(kind, resourceId);
   // The insert itself enforces the per-user cap, including concurrent requests.
   const now = Date.now();
-  const result = await getD1().prepare("INSERT INTO bookmarks(user_id,kind,resource_id,title,href,created_at) SELECT ?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM bookmarks WHERE user_id=?)<500 OR EXISTS(SELECT 1 FROM bookmarks WHERE user_id=? AND kind=? AND resource_id=?) ON CONFLICT(user_id,kind,resource_id) DO UPDATE SET title=excluded.title,href=excluded.href RETURNING created_at")
+  const result = await getD1().prepare("INSERT INTO bookmarks(user_id,kind,resource_id,title,href,created_at) SELECT ?,?,?,?,?,? WHERE (SELECT COUNT(*) FROM bookmarks WHERE user_id=? AND kind!='version')<500 OR EXISTS(SELECT 1 FROM bookmarks WHERE user_id=? AND kind=? AND resource_id=?) ON CONFLICT(user_id,kind,resource_id) DO UPDATE SET title=excluded.title,href=excluded.href RETURNING created_at")
     .bind(userId, entry.kind, entry.resourceId, entry.title, entry.href, now, userId, userId, entry.kind, entry.resourceId).first<{ created_at: number }>();
   if (!result) throw new PortalError(409, "보관함은 최대 500개까지 저장할 수 있습니다.");
   return { ...entry, createdAt: new Date(result.created_at).toISOString() };
@@ -111,6 +105,6 @@ export async function getHeartbeatRows() {
 }
 
 export async function totalSaved(userId: string) {
-  const [row] = await getDb().select({ count: sql<number>`count(*)` }).from(bookmarks).where(eq(bookmarks.userId, userId));
+  const [row] = await getDb().select({ count: sql<number>`count(*)` }).from(bookmarks).where(and(eq(bookmarks.userId, userId), ne(bookmarks.kind, "version")));
   return row.count;
 }

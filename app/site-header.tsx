@@ -18,7 +18,6 @@ const links = [
   { href: "/servers", label: "servers" },
   { href: "/forum", label: "forum" },
   { href: "/guide", label: "guide" },
-  { href: "/minecraft", label: "minecraft" },
 ] as const;
 const appearances = [
   { key: "light", label: "라이트" },
@@ -98,7 +97,7 @@ export default function SiteHeader() {
 
   return (
     <header className="site-header brand-header">
-      <div className="shell header-line" data-home={pathname === "/" ? "true" : undefined}>
+      <div className="header-line">
         <Link href="/" className="brand" aria-label="리뱅 온라인 홈">
           <Reatic label="wordmark" decorative />
           <Reatic label="online" decorative />
@@ -113,7 +112,6 @@ export default function SiteHeader() {
         </nav>
 
         <div className="header-utilities">
-          <Link href="/guide#connect" className="header-connect"><Reatic label="join" /></Link>
           <DropdownMenu open={accountOpen} onOpenChange={open => setMenuPath(open ? pathname : null)} modal={false}>
             <DropdownMenuTrigger asChild>
               <button type="button" className="account-trigger" aria-label="계정 메뉴" title="계정 메뉴">

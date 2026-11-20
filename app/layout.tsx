@@ -42,9 +42,11 @@ export default function RootLayout({
               <SearchProvider>
                 <ServerStatusProvider>
                   <a className="skip-link" href="#main-content"><Reatic label="skip" /></a>
-                  <SiteHeader />
-                  <div id="main-content" tabIndex={-1}>{children}</div>
-                  <SiteFooter />
+                  <div className="site-layout">
+                    <SiteHeader />
+                    <div id="main-content" tabIndex={-1}>{children}</div>
+                    <SiteFooter />
+                  </div>
                 </ServerStatusProvider>
               </SearchProvider>
             </BookmarksProvider>

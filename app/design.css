@@ -48,9 +48,6 @@ body{font-size:15px;line-height:1.75}svg{stroke-linecap:round;stroke-linejoin:ro
 .choice-scroll>button:hover{border-color:var(--accent)}
 .choice-scroll>button:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
 .topic-tabs.choice-scroll{margin-bottom:0}
-.infinite-list-end{display:grid;justify-items:center;gap:7px;padding:28px 12px;margin-top:20px;color:var(--muted);font-size:11px;text-align:center;min-height:85px;border-top:1px solid var(--line)}
-.infinite-list-end>span{font-variant-numeric:tabular-nums}.infinite-list-end>p{font-size:12px}
-.infinite-list-end:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 /* Distinguish filled actions from text accents, including automatic theme mode. */
 .btn-primary,.login-primary,.publish,.guide-editor-actions button[type=submit],.header-connect,.compose-fab,.admin-primary{background:var(--accent-solid);color:var(--on-accent);border-color:var(--accent-solid)}
 .btn-primary:hover{background:var(--accent-solid);color:var(--on-accent)}

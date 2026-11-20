@@ -9,11 +9,11 @@ test('Spotlight ranks titles first, requires every token, and keeps stable ties'
     {id:'a',kind:'guide',title:'접속 방법',description:'Dongwon 서버'},
     {id:'b',kind:'server',title:'Dongwon',description:'평화 야생'},
     {id:'c',kind:'post',title:'Dongwon 소식',description:'평화 야생'},
-    {id:'d',kind:'version',title:'26.3',description:'Wilderness Bound'},
+    {id:'d',kind:'update',title:'운영 점검',description:'서버 점검 기록'},
   ];
   assert.deepEqual(searchEntries(entries,'DONGWON').map(x=>x.id),['b','c','a']);
   assert.deepEqual(searchEntries(entries,'dongwon 평화').map(x=>x.id),['b','c']);
-  assert.deepEqual(searchEntries(entries,'26.3 Wilderness').map(x=>x.id),['d']);
+  assert.deepEqual(searchEntries(entries,'운영 기록').map(x=>x.id),['d']);
   assert.deepEqual(searchEntries(entries,'없는 내용'),[]);
   assert.deepEqual(searchEntries(entries,' ').map(x=>x.id),['a','b']);
 });
