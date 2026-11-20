@@ -29,3 +29,12 @@ and WOFF2 encoding:
 `0000–024F, 1100–11FF, 2000–206F, 20A0–20CF, 2100–214F, 2190–21FF, 2460–24FF, 3000–303F, 3130–318F, AC00–D7A3, FF00–FFEF`.
 
 Public font size: 2,057,688 → 1,223,408 bytes, about 40.5% smaller.
+
+## Reatic wordmark and fixed labels
+
+The homepage logo and the fixed words in the brand and navigation use PNGs
+rendered from Reatic 1.0.0 (Wide Bold, Narrow Bold, and Regular). The output lives
+in `public/brand/reatic/`. The [creator's original distribution](https://www.reaticindustry.com/reaticfont)
+allows image use. The site ships the rendered images and does not include or modify
+the font files. Each image has a text alternative or a labelled parent. The server
+address also stays selectable text.

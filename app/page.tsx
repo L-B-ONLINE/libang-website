@@ -1,10 +1,28 @@
-import { listPosts } from "../db/forum";
-import HomeExperience from "./home-experience";
+import Link from "@/components/site-link";
+import Reatic from "@/components/reatic";
+import { serverAddress } from "@/lib/servers";
+import { LiveStatus } from "./server-status-provider";
 
-export const dynamic = "force-dynamic";
-export default async function Home() {
-  let posts: Awaited<ReturnType<typeof listPosts>> = [];
-  let unavailable = false;
-  try { posts = (await listPosts()).slice(0, 4); } catch { unavailable = true; }
-  return <HomeExperience posts={posts.map(post => ({ id: post.id, title: post.title, category: post.category, createdAt: post.createdAt.toISOString() }))} unavailable={unavailable} />;
+export default function Home() {
+  return (
+    <main className="shell brand-home" aria-labelledby="brand-home-title">
+      <div className="brand-home-identity">
+        <h1 id="brand-home-title">
+          <Reatic label="wordmark" className="brand-home-wordmark" fetchPriority="high" />
+        </h1>
+        <p className="brand-home-description"><Reatic label="description" /></p>
+      </div>
+
+      <div className="brand-home-connect">
+        <div className="brand-address" role="group" aria-label="서버 접속 주소">
+          <Reatic label="address" decorative />
+          <code>{serverAddress}</code>
+        </div>
+        <Link className="brand-guide-link" href="/guide#connect">
+          <Reatic label="connect" />
+        </Link>
+        <LiveStatus compact />
+      </div>
+    </main>
+  );
 }

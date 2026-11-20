@@ -12,9 +12,9 @@
 .admin-main button.admin-refresh { background: transparent; }
 .admin-main .admin-primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
 .admin-main .admin-primary:enabled:hover { background: var(--text); border-color: var(--text); color: var(--bg); }
-.admin-main .admin-danger { color: #b43236; }
-:root[data-theme=dark] .admin-main .admin-danger { color: #ffaaa8; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme=light]) .admin-main .admin-danger { color: #ffaaa8; } }
+.admin-main .admin-danger { color: var(--text); }
+:root[data-theme=dark] .admin-main .admin-danger { color: var(--text); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme=light]) .admin-main .admin-danger { color: var(--text); } }
 .admin-state { padding: 35px 18px; color: var(--muted); font-size: 14px; text-align: center; }
 .admin-state .btn { margin-top: 18px; }
 .admin-note { display: flex; align-items: start; gap: 8px; font-size: 12px; color: var(--muted); line-height: 1.8; margin: 17px 0; overflow-wrap: anywhere; }
